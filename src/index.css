@@ -19,6 +19,11 @@ body {
   background-color: #202020;
 }
 
+input {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+    Arial, sans-serif;
+}
+
 #container {
   display: flex;
   flex-direction: column;
@@ -48,7 +53,7 @@ body {
   gap: 1em;
 }
 
-#buttons button {
+button {
   border: none;
   border-radius: 15em;
 
@@ -57,10 +62,6 @@ body {
   cursor: pointer;
 
   font-size: 1.1em;
-}
-
-#reset {
-  display: none;
 }
 
 #start {
@@ -73,6 +74,7 @@ body {
 }
 
 #stop {
+  display: none;
   color: #000000;
   background-color: #e99595;
 }
@@ -109,39 +111,32 @@ body {
   justify-content: center;
 }
 
+#timerForm #inputs {
+  margin-right: -2px;
+}
+
 #timerForm input {
   font-size: 5em;
-  padding: 0.1em 0.2em;
-  width: 1.5em;
-
+  width: 1.1em;
   border: none;
-  border-radius: 0.5em;
+
+  margin: 0 -2.8px;
 
   direction: rtl;
   text-align: right;
 
   background-color: #202020;
-  /* background-color: #ffffff; */
 }
 
 #timerForm label {
-  font-size: 2.5em;
+  font-size: 5em;
 }
 
 #timerForm input:focus {
-  outline: 2px solid #7a97e7;
+  outline: none;
 }
 
 #timerForm button {
-  font-size: 1.1em;
-  border: none;
-  border-radius: 15em;
-  padding: 0.6em 1.2em;
-
-  margin-top: 1em;
-
-  cursor: pointer;
-
   background-color: #95abe9;
   color: #000000;
 }
