@@ -19,12 +19,26 @@ body {
   background-color: #202020;
 }
 
+#container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
 #title {
   text-align: center;
+  font-size: 2.5em;
 }
 
 #timer {
   font-size: 5em;
+}
+
+#timer:hover {
+  cursor: pointer;
+
+  color: #5e82e4;
 }
 
 /* BUTTONS */
@@ -51,11 +65,11 @@ body {
 
 #start {
   background-color: #95ABE9;
-  color: #202020;
+  color: #000000;
 }
 
 #start:hover {
-  background-color: #839ee7;
+  background-color: #7a97e7;
 }
 
 #stop {
@@ -81,3 +95,70 @@ body {
   color: #000000;
   background-color: #404040;
 }
+
+/* FORM */
+
+#timerForm {
+  display: none;
+}
+
+#timerForm form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#timerForm input {
+  font-size: 5em;
+  padding: 0.1em 0.2em;
+  width: 1.5em;
+
+  border: none;
+  border-radius: 0.5em;
+
+  direction: rtl;
+  text-align: right;
+
+  background-color: #202020;
+  /* background-color: #ffffff; */
+}
+
+#timerForm label {
+  font-size: 2.5em;
+}
+
+#timerForm input:focus {
+  outline: 2px solid #7a97e7;
+}
+
+#timerForm button {
+  font-size: 1.1em;
+  border: none;
+  border-radius: 15em;
+  padding: 0.6em 1.2em;
+
+  margin-top: 1em;
+
+  cursor: pointer;
+
+  background-color: #95abe9;
+  color: #000000;
+}
+
+#timerForm button:hover {
+  background-color: #7a97e7;
+}
+
+/* Hide the default spinner */
+/* Chrome, Edge, Safari */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox - non-standard */
+/* input[type=number] {
+  -moz-appearance: textfield;
+} */

@@ -10,11 +10,26 @@
 
 <body>
   <h1 id="title">Timer</h1>
-  <div id="timer">0:00:00</div>
-  <div id="buttons">
-    <button id="start">Start</button>
-    <button id="stop">Stop</button>
-    <button id="reset">Reset</button>
+  <div id="container">
+    <div id="timer">0:00:00</div>
+    <div id="buttons">
+      <button id="start">Start</button>
+      <button id="stop">Stop</button>
+      <button id="reset">Reset</button>
+    </div>
+  </div>
+
+  <div id="timerForm">
+    <form action="">
+      <div id="inputs">
+        <input type="number" name="hours" />
+        <label for="minutes">:</label>
+        <input type="number" name="minutes" />
+        <label for="seconds">:</label>
+        <input type="number" name="seconds" />
+      </div>
+      <button type="button" id="setTimer">Set Timer</button>
+    </form>
   </div>
 </body>
 
