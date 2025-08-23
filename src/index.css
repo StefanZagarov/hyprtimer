@@ -122,8 +122,8 @@ button {
 
   margin: 0 -2.8px;
 
-  direction: rtl;
-  text-align: right;
+  /* direction: rtl;
+  text-align: right; */
 
   background-color: #202020;
 }
