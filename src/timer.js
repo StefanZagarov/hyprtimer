@@ -1,152 +1,201 @@
 const container = document.getElementById('container');
-const timerForm = document.getElementById('timerForm');
+const timerFormContainer = document.getElementById('timerForm');
 const form = document.querySelector('form');
-const timer = document.getElementById('timer');
+const timerDisplay = document.getElementById('timer');
 const startButton = document.getElementById('start');
 const stopButton = document.getElementById('stop');
-const resetButton = document.getElementById('reset');
+const clearButton = document.getElementById('clear');
 const setTimerButton = document.getElementById('setTimer');
 
 // Notes
-// After a reset, the first second passes way too quickly
+// Sometimes when the time is set to 1 second, it counts down to -1:-1:-1, or if its 2 seconds it counts down to 00:00:00 and then -1:-1:-1
 
+const timerState = {
+    IDLE: `idle`,
+    RUNNING: `running`,
+    PAUSED: `paused`,
+    FINISHED: `finished`,
+};
+
+let state = timerState.IDLE;
 let timeSet = `00:00:00`;
-let remainingTime = `00:00:00`;
-let endTime = `0`;
-
-let isRunning = false;
-let hasPaused = false;
-let hasFinished = false;
 
 let intervalId = null;
 
-timer.addEventListener('click', () => {
+// ================================
+// EVENT LISTENERS
+// ================================
+
+// Form
+timerDisplay.addEventListener('click', handleTimerForm);
+form.elements.hours.addEventListener('input', handleFormInput);
+form.elements.minutes.addEventListener('input', handleFormInput);
+form.elements.seconds.addEventListener('input', handleFormInput);
+
+// Buttons
+setTimerButton.addEventListener('click', handleSetTimer);
+clearButton.addEventListener('click', handleResetTimer);
+startButton.addEventListener('click', handleStartTimer);
+stopButton.addEventListener('click', handleStopTimer);
+
+// ================================
+// FUNCTIONS
+// ================================
+
+function handleTimerForm() {
     container.style.display = 'none';
 
-    const hours = timer.textContent.split(':')[0];
-    const minutes = timer.textContent.split(':')[1];
-    const seconds = timer.textContent.split(':')[2];
+    const hours = timerDisplay.textContent.split(':')[0];
+    const minutes = timerDisplay.textContent.split(':')[1];
+    const seconds = timerDisplay.textContent.split(':')[2];
 
     form.elements.hours.value = hours;
     form.elements.minutes.value = minutes;
     form.elements.seconds.value = seconds;
 
-    timerForm.style.display = 'flex';
-    form.elements.minutes.focus();
-});
+    timerFormContainer.style.display = 'flex';
+}
 
-form.elements.hours.addEventListener('input', () => {
-    if (form.elements.hours.value.length > 2) {
-        form.elements.hours.value = form.elements.hours.value.slice(1);
+function handleFormInput(input) {
+    const target = input.target.name;
+
+    if (form.elements[target].value.length > 2) {
+        form.elements[target].value = form.elements[target].value.slice(1);
     }
 
-    if (form.elements.hours.value.length < 2) {
-        form.elements.hours.value = '0' + form.elements.hours.value;
-    }
-});
-
-form.elements.minutes.addEventListener('input', () => {
-    if (form.elements.minutes.value.length > 2) {
-        form.elements.minutes.value = form.elements.minutes.value.slice(1);
+    if ((target === "minutes" || target === "seconds") && form.elements[target].value > 59) {
+        console.log(form.elements[target].value);
+        form.elements[target].value = 59;
     }
 
-    if (form.elements.minutes.value > 59) {
-        form.elements.minutes.value = 59;
+    if (form.elements[target].value.length < 2) {
+        form.elements[target].value = '0' + form.elements[target].value;
     }
+}
 
-    if (form.elements.minutes.value.length < 2) {
-        form.elements.minutes.value = '0' + form.elements.minutes.value;
-    }
-});
+function handleSetTimer() {
+    timeSet = `${form.elements.hours.value}:${form.elements.minutes.value}:${form.elements.seconds.value}`;
 
-form.elements.seconds.addEventListener('input', () => {
-    if (form.elements.seconds.value.length > 2) {
-        form.elements.seconds.value = form.elements.seconds.value.slice(1);
-    }
+    timerDisplay.textContent = timeSet;
 
-    if (form.elements.seconds.value > 59) {
-        form.elements.seconds.value = 59;
-    }
-
-    if (form.elements.seconds.value.length < 2) {
-        form.elements.seconds.value = '0' + form.elements.seconds.value;
-    }
-});
-
-setTimerButton.addEventListener('click', () => {
-    const timerConcat = `${form.elements.hours.value}:${form.elements.minutes.value}:${form.elements.seconds.value}`;
-
-    timeSet = timerConcat;
-
-    timer.textContent = timerConcat;
-
-    timerForm.style.display = 'none';
+    timerFormContainer.style.display = 'none';
     container.style.display = 'flex';
-});
 
-resetButton.addEventListener('click', () => {
+    clearButton.textContent = 'Clear';
+    enableButton(startButton, 'start');
+
+    state = timerState.IDLE;
+
+    if (timeSet === '00:00:00') {
+        disableButton(startButton);
+    }
+}
+
+function handleResetTimer() {
     clearInterval(intervalId);
 
-    if (!isRunning && !hasPaused) {
-        timer.textContent = '00:00:00';
+    if (state == timerState.FINISHED) {
+        state = timerState.IDLE;
+        timerDisplay.textContent = timeSet;
+
+        clearButton.textContent = 'Clear';
+        hideButton(stopButton);
+        showButton(startButton);
     }
-
-    if (!isRunning && hasPaused) {
-        timer.textContent = timeSet;
-
-        hasPaused = false;
+    else if (state === timerState.IDLE) {
+        timerDisplay.textContent = '00:00:00';
+        disableButton(startButton);
     }
-});
+    else if (state === timerState.PAUSED) {
+        timerDisplay.textContent = timeSet;
+        state = timerState.IDLE;
+        clearButton.textContent = 'Clear';
+    }
+}
 
-startButton.addEventListener('click', () => {
-    if (timer.textContent === '00:00:00') return;
+function handleStartTimer() {
+    if (timerDisplay.textContent === '00:00:00') return;
 
-    isRunning = true;
+    hideButton(startButton);
+    enableButton(stopButton, 'stop');
+    showButton(stopButton);
+    disableButton(clearButton);
+    clearButton.textContent = 'Reset';
 
-    startButton.style.display = 'none';
-    stopButton.style.display = 'flex';
+    let displayTime = timerDisplay.textContent;
+    let endTime = `0`;
 
-    if (!hasPaused) {
-        const [hours, minutes, seconds] = timeSet.split(`:`).map(Number);
+    let [hours, minutes, seconds] = [0, 0, 0];
 
-        const setTimeInMilliseconds = (hours * 3600 + minutes * 60 + seconds) * 1000;
-        endTime = Date.now() + setTimeInMilliseconds;
+    if (state == timerState.IDLE) {
+        [hours, minutes, seconds] = timeSet.split(`:`).map(Number);
     }
     else {
-        endTime = Date.now() + remainingTime;
+        [hours, minutes, seconds] = displayTime.split(`:`).map(Number);
     }
 
-    hasPaused = false;
-    intervalId = setInterval(() => {
-        if (!isRunning) return;
+    const setTimeInMilliseconds = (hours * 3600 + minutes * 60 + seconds) * 1000;
+    endTime = Date.now() + setTimeInMilliseconds;
 
-        remainingTime = endTime - Date.now();
+    state = timerState.RUNNING;
+
+    countDown(endTime, displayTime);
+}
+
+function countDown(endTime, displayTime) {
+    intervalId = setInterval(() => {
+        if (state === timerState.FINISHED) return;
+
+        displayTime = endTime - Date.now();
+        console.log(endTime, displayTime);
 
         // Update the displayed time
-        const hours = Math.floor(remainingTime / 3600000);
-        const minutes = Math.floor((remainingTime % 3600000) / 60000);
-        const seconds = Math.floor((remainingTime % 60000) / 1000);
+        const hours = Math.floor(displayTime / 3600000);
+        const minutes = Math.floor((displayTime % 3600000) / 60000);
+        const seconds = Math.floor((displayTime % 60000) / 1000);
 
-        timer.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        timerDisplay.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 
-        if (remainingTime <= 0) {
-            isRunning = false;
-            hasFinished = true;
+        if (displayTime <= 0) {
+            state = timerState.FINISHED;
 
-            // Gray out the stop button
-            stopButton.classList.remove('stop');
-            stopButton.classList.add('disabled');
+            clearInterval(intervalId);
+
+            disableButton(stopButton);
+            clearButton.textContent = 'Reset';
+            enableButton(clearButton, 'clear');
         }
     }, 1000);
-});
+}
 
-stopButton.addEventListener('click', () => {
-    isRunning = false;
-    hasPaused = true;
+function handleStopTimer() {
+    state = timerState.PAUSED;
 
     clearInterval(intervalId);
 
-    stopButton.style.display = 'none';
-    startButton.style.display = 'flex';
-});
+    hideButton(stopButton);
+    showButton(startButton);
+    enableButton(clearButton, 'clear');
+}
 
+// ================================
+// BUTTON MANAGEMENT FUNCTIONS
+// ================================
+
+function disableButton(button) {
+    button.classList.add('disabled');
+    button.disabled = true;
+}
+
+function enableButton(button, id) {
+    button.classList.remove('disabled');
+    button.disabled = false;
+}
+
+function hideButton(button) {
+    button.style.display = 'none';
+}
+
+function showButton(button) {
+    button.style.display = 'flex';
+}

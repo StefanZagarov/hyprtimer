@@ -83,19 +83,19 @@ button {
   background-color: #e98282;
 }
 
-#reset {
+#clear {
   color: #000000;
   background-color: #e99595;
 }
 
-#reset:hover {
+#clear:hover {
   background-color: #e98282;
 }
 
-#disabled {
+.disabled {
   cursor: not-allowed;
-  color: #000000;
-  background-color: #404040;
+  color: #000000 !important;
+  background-color: #6b6b6b !important;
 }
 
 /* FORM */
