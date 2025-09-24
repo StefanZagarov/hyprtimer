@@ -12,8 +12,7 @@ const timerModeBtns = document.querySelectorAll('.toggle-option');
 const highlingt = document.getElementById('highlight');
 
 // Notes
-// TODO CURRENT: Instant doesnt count the seconds normally, it slows down then speeds up
-// TODO CURRENT: Implement a toggle between the two types of countdown, one for the current and one to take the current time as base second, check the chat with Qwen
+// TODO: Add sound effect when the timer is finished
 // TODO: Add transition time for the hover effects
 // Suggestion: Add a small text saying the exact time (in HH:MM:SS) when the timer has stopped
 
@@ -241,70 +240,49 @@ function handleStartTimer() {
 
 /**
  * The core countdown engine.
- * Uses real-time calculation to avoid drift.
+ * Uses real-time calculation to avoid drift and supports two timing modes:
  * 
- * How it works:
- * 1. Calculates remaining seconds using Math.ceil → ensures 1 full second is shown until deadline
- * 2. Only updates DOM when the displayed second changes
- * 3. Schedules next tick to wake up just after the next whole second (aligned with wall-clock)
- * 4. Handles system resume via Electron's powerMonitor (via window.electronAPI)
- * 5. Returns a cleanup function to prevent memory leaks
+ * 1. **Clock Mode**: Aligns updates to wall-clock seconds (e.g., :005 of each second)
  * 
- * This design is:
- * - Accurate: hits 00:00 exactly at deadline
- * - Efficient: only runs once per second
- * - Resilient: recovers from system sleep
- * - Synchronized: visually aligned with clock seconds
+ * 2. **Instant Mode**: Anchors updates to the exact millisecond the timer started
  * 
- * @param {number} endTime - The absolute timestamp (Date.now()) when the timer should finish
- * @returns {function} Cleanup function to stop the timer safely
+ * @param {number} endTime - Absolute timestamp (from `Date.now()`) when timer should finish
+ * @returns {function} Cleanup function to safely stop the timer and unregister listeners
  */
 function countDown(endTime) {
-    const startTime = Date.now(); // Get the start time immediately
-    let timer = 0;         // Stores setTimeout ID for cancellation
-    let lastSec = -1;      // Tracks last displayed second to avoid redundant updates
+    const startTime = Date.now();
 
-    /**
-     * Main tick function — called once per second (aligned to clock)
-     * Recalculates remaining time and updates display if changed.
-     */
+    let timer = 0;
+
+    let lastSec = -1;
+
     const tick = () => {
-        // If already finished, do nothing (safety guard)
         if (state === timerState.FINISHED) return;
 
-        // Calculate remaining whole seconds, rounded up to ensure full second display
-        // Math.ceil ensures that 999ms still shows as 1 second
-        // Math.max(0, ...) prevents negative values
         const left = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
 
-        // Only update DOM if the displayed second has changed
         if (left !== lastSec) {
             lastSec = left;
 
-            // Format into HH:MM:SS with leading zeros
             const h = String(Math.floor(left / 3600)).padStart(2, '0');
             const m = String(Math.floor((left % 3600) / 60)).padStart(2, '0');
             const s = String(left % 60).padStart(2, '0');
             timerDisplay.textContent = `${h}:${m}:${s}`;
+
             console.log(left, Date.now());
-            // If time is up, finish the timer
-            if (left === 0) { finishTimer(); return; }
+
+            if (left === 0) {
+                finishTimer();
+                return;
+            }
         }
 
-        // Calculate delay to wake up just after the next whole second
-        // Example: if current time is :123, wait 877ms + 5ms → wake at :005 of next second
-        // This ensures visual alignment with wall-clock seconds and avoids 999ms jitter
-        // ! Option between this and instant start (and start with current millisecond)
         let delay = 0;
 
         if (currentTimerMode === 'clock') {
-            console.log('clock');
             delay = 1000 - (Date.now() % 1000) + 5;
-
         }
         else if (currentTimerMode === 'instant') {
-            console.log('instant');
-
             const elapsed = Date.now() - startTime;
             const nextTickTime = startTime + Math.ceil((elapsed + 1) / 1000) * 1000;
             delay = Math.max(0, nextTickTime - Date.now());
@@ -313,40 +291,28 @@ function countDown(endTime) {
         timer = setTimeout(tick, delay);
     };
 
-    /**
-     * Called when timer reaches zero.
-     * Updates state, cleans up, and adjusts UI.
-     */
     const finishTimer = () => {
         state = timerState.FINISHED;
-        clearTimeout(timer);                  // Cancel any pending timeout
-        window.electronAPI.removeResume(tick); // Unregister from resume events
 
-        // Update UI
+        clearTimeout(timer);
+
+        window.electronAPI.removeResume(tick);
+
         disableButton(stopButton);
         clearButton.textContent = 'Reset';
         enableButton(clearButton, 'clear');
     };
 
-    // Start the countdown
     tick();
 
-    // Register this tick function to be called when system resumes from sleep
     window.electronAPI.onResume(tick);
 
-    // Return a cleanup function to safely stop the timer
     return () => {
         clearTimeout(timer);
         window.electronAPI.removeResume(tick);
     };
-};
+}
 
-/**
- * Pauses the running timer.
- * - Sets state to PAUSED
- * - Cancels the countdown (via cleanup function)
- * - Updates UI: hide stop, show start, enable clear
- */
 function handleStopTimer() {
     state = timerState.PAUSED;
 
