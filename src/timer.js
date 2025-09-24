@@ -8,8 +8,12 @@ const startButton = document.getElementById('start');
 const stopButton = document.getElementById('stop');
 const clearButton = document.getElementById('clear');
 const setTimerButton = document.getElementById('setTimer');
+const timerModeBtns = document.querySelectorAll('.toggle-option');
+const highlingt = document.getElementById('highlight');
 
 // Notes
+// TODO CURRENT: Instant doesnt count the seconds normally, it slows down then speeds up
+// TODO CURRENT: Implement a toggle between the two types of countdown, one for the current and one to take the current time as base second, check the chat with Qwen
 // TODO: Add transition time for the hover effects
 // Suggestion: Add a small text saying the exact time (in HH:MM:SS) when the timer has stopped
 
@@ -34,6 +38,9 @@ let timeSet = `00:00:00`;
 // Allows safe cancellation of the current countdown
 let cancelCountdown = null;
 
+// Store the timer mode
+let currentTimerMode = timerModeBtns[0].dataset.mode;
+
 // ================================
 // EVENT LISTENERS
 // ================================
@@ -54,9 +61,30 @@ clearButton.addEventListener('click', handleResetTimer);    // Reset timer based
 startButton.addEventListener('click', handleStartTimer);    // Start or resume countdown
 stopButton.addEventListener('click', handleStopTimer);      // Pause the running timer
 
+timerModeBtns.forEach(button => {
+    button.addEventListener('click', handleTimerMode);
+});
 // ================================
 // FUNCTIONS
 // ================================
+
+function handleTimerMode(e) {
+    const btn = e.currentTarget;
+
+    if (btn.dataset.mode === currentTimerMode) return;
+
+    timerModeBtns.forEach(button => {
+        const isActive = button.dataset.mode === btn.dataset.mode;
+
+        button.classList.toggle('active', isActive);
+        button.setAttribute('aria-pressed', isActive);
+    });
+
+    highlight.style.width = `${btn.offsetWidth + 1}px`;
+    highlight.style.transform = `translateX(${btn.offsetLeft}px)`;
+
+    currentTimerMode = btn.dataset.mode;
+}
 
 /**
  * Opens the time edit form when the user clicks the timer display.
@@ -95,7 +123,6 @@ function handleFormInput(input) {
 
     // Ensure minutes and seconds don't exceed 59
     if ((target === "minutes" || target === "seconds") && form.elements[target].value > 59) {
-        console.log(form.elements[target].value);
         form.elements[target].value = 59;
     }
 
@@ -233,6 +260,7 @@ function handleStartTimer() {
  * @returns {function} Cleanup function to stop the timer safely
  */
 function countDown(endTime) {
+    const startTime = Date.now(); // Get the start time immediately
     let timer = 0;         // Stores setTimeout ID for cancellation
     let lastSec = -1;      // Tracks last displayed second to avoid redundant updates
 
@@ -247,7 +275,7 @@ function countDown(endTime) {
         // Calculate remaining whole seconds, rounded up to ensure full second display
         // Math.ceil ensures that 999ms still shows as 1 second
         // Math.max(0, ...) prevents negative values
-        const left = Math.max(0, Math.ceil((endTime - Date.now()) / 1000)); // ①
+        const left = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
 
         // Only update DOM if the displayed second has changed
         if (left !== lastSec) {
@@ -258,7 +286,7 @@ function countDown(endTime) {
             const m = String(Math.floor((left % 3600) / 60)).padStart(2, '0');
             const s = String(left % 60).padStart(2, '0');
             timerDisplay.textContent = `${h}:${m}:${s}`;
-            console.log(left);
+            console.log(left, Date.now());
             // If time is up, finish the timer
             if (left === 0) { finishTimer(); return; }
         }
@@ -266,7 +294,22 @@ function countDown(endTime) {
         // Calculate delay to wake up just after the next whole second
         // Example: if current time is :123, wait 877ms + 5ms → wake at :005 of next second
         // This ensures visual alignment with wall-clock seconds and avoids 999ms jitter
-        const delay = 1000 - (Date.now() % 1000) + 5;
+        // ! Option between this and instant start (and start with current millisecond)
+        let delay = 0;
+
+        if (currentTimerMode === 'clock') {
+            console.log('clock');
+            delay = 1000 - (Date.now() % 1000) + 5;
+
+        }
+        else if (currentTimerMode === 'instant') {
+            console.log('instant');
+
+            const elapsed = Date.now() - startTime;
+            const nextTickTime = startTime + Math.ceil((elapsed + 1) / 1000) * 1000;
+            delay = Math.max(0, nextTickTime - Date.now());
+        }
+
         timer = setTimeout(tick, delay);
     };
 
@@ -296,7 +339,7 @@ function countDown(endTime) {
         clearTimeout(timer);
         window.electronAPI.removeResume(tick);
     };
-}
+};
 
 /**
  * Pauses the running timer.
