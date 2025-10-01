@@ -11,26 +11,30 @@ const setTimerButton = document.getElementById('setTimer');
 const timerModeBtns = document.querySelectorAll('.toggle-option');
 const highlingt = document.getElementById('highlight');
 
-// Notes
-// TODO: Add sound effect when the timer is finished
 // TODO: Add transition time for the hover effects
-// Suggestion: Add a small text saying the exact time (in HH:MM:SS) when the timer has stopped
+// TODO: Add a small text saying the exact time (in HH:MM:SS) when the timer has stopped - make it an option
+// TODO: Add a timer next to that text counting how long it has been since the timer has stopped - make it an option
+// TODO: Save settings to a local storage
+// TODO: Disable buttons for changing time and changing count mode when the timer is running
+// TODO: Refactor
 
 // === TIMER STATE MACHINE ===
 // Defines all possible states the timer can be in
 // This prevents invalid transitions (e.g., starting a finished timer)
 const timerState = {
-    IDLE: `idle`,      // Timer set but not running
-    RUNNING: `running`, // Actively counting down
-    PAUSED: `paused`,   // Stopped mid-countdown
-    FINISHED: `finished` // Countdown reached zero
+    IDLE: `idle`,
+    RUNNING: `running`,
+    PAUSED: `paused`,
+    FINISHED: `finished`
 };
 
-// Current state of the timer (starts idle)
+const timeUpSound = new Audio('./assets/alarms/jobs done.mp3');
+
+// Start in idle state
 let state = timerState.IDLE;
 
 // Stores the original time the user set (e.g., "01:30:00")
-// Used to reset or restart from the same duration
+// Used to reset from the same duration
 let timeSet = `00:00:00`;
 
 // Holds a reference to the cleanup function returned by countDown()
@@ -67,6 +71,7 @@ timerModeBtns.forEach(button => {
 // FUNCTIONS
 // ================================
 
+/** Sets the Clock and Instant modes */
 function handleTimerMode(e) {
     const btn = e.currentTarget;
 
@@ -269,7 +274,7 @@ function countDown(endTime) {
             const s = String(left % 60).padStart(2, '0');
             timerDisplay.textContent = `${h}:${m}:${s}`;
 
-            console.log(left, Date.now());
+            console.log(left, Date.now(), currentTimerMode);
 
             if (left === 0) {
                 finishTimer();
@@ -301,6 +306,8 @@ function countDown(endTime) {
         disableButton(stopButton);
         clearButton.textContent = 'Reset';
         enableButton(clearButton, 'clear');
+
+        timeUpSound.play();
     };
 
     tick();

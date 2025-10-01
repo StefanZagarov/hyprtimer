@@ -38,6 +38,8 @@ input {
 
 #timer {
   font-size: 5em;
+
+  transition: color 0.2s ease-in-out;
 }
 
 #timer:hover {
@@ -67,6 +69,8 @@ button {
 #start {
   background-color: #95ABE9;
   color: #000000;
+
+  transition: background-color 0.2s ease-in-out;
 }
 
 #start:hover {
@@ -77,6 +81,8 @@ button {
   display: none;
   color: #000000;
   background-color: #e99595;
+
+  transition: background-color 0.2s ease-in-out;
 }
 
 #stop:hover {
@@ -86,6 +92,8 @@ button {
 #clear {
   color: #000000;
   background-color: #e99595;
+
+  transition: background-color 0.2s ease-in-out;
 }
 
 #clear:hover {
@@ -139,6 +147,8 @@ button {
 #timerForm button {
   background-color: #95abe9;
   color: #000000;
+
+  transition: background-color 0.2s ease-in-out;
 }
 
 #timerForm button:hover {
