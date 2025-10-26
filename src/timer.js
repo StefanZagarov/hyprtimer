@@ -13,6 +13,7 @@ const highlight = document.getElementById("highlight");
 const title = document.getElementById("title");
 
 // TODO: Add a small text saying the exact time (in HH:MM:SS) when the timer has stopped - make it an option
+// TODO: Improve state text ("Running", "Timer set", etc) - think of a better way to connect it to the state than writing it in specific places in the code, maybe a function that checks state change
 // TODO: Add a timer next to that text counting how long it has been since the timer has stopped - make it an option
 // TODO: Save settings to a local storage
 // TODO: Disable buttons for changing time and changing count mode when the timer is running
