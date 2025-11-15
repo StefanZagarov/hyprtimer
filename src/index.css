@@ -2,8 +2,6 @@
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-
-  color: #95abe9;
 }
 
 body {
@@ -35,12 +33,13 @@ input {
 
 #title {
   text-align: center;
+  color: #95abe9;
   font-size: 2.5em;
 }
 
 #timer {
   font-size: 5em;
-
+  color: #95abe9;
   transition: color 0.2s ease-in-out;
 }
 
@@ -219,3 +218,48 @@ input[type="number"]::-webkit-outer-spin-button {
   color: white;
 }
 
+#settings {
+  position: fixed;
+  right: 3rem;
+  top: 10%;
+}
+
+#settings-icon {
+  display: flex;
+  align-items: center;
+  max-width: fit-content;
+
+  transition: background-color 0.2s ease-in-out;
+}
+#settings-icon:hover {
+  background-color: #2b2b2b;
+  cursor: pointer;
+}
+
+#cog {
+  width: 20px;
+  height: 20px;
+  color: #c4c4c4;
+}
+
+#chevron {
+  width: 15px;
+  height: 15px;
+  color: #c4c4c4;
+  transition: transform 0.2s ease;
+  transform-origin: center;
+}
+
+#chevron.open {
+  transform: rotate(90deg);
+}
+
+#settings-panel {
+  display: none;
+}
+
+#settings-panel.open{
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}

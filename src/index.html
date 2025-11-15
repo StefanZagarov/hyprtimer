@@ -1,53 +1,115 @@
 <!doctype html>
 <html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; media-src 'self';"
+    />
+    <title>Hyprtimer</title>
+    <link rel="stylesheet" href="index.css" />
+    <script defer src="state.js"></script>
+    <script defer src="timer.js"></script>
+    <script defer src="ui.js"></script>
+    <script defer src="renderer.js"></script>
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; media-src 'self';" />
-  <title>Hyprtimer</title>
-  <link rel="stylesheet" href="index.css" />
-  <script defer src="state.js"></script>
-  <script defer src="timer.js"></script>
-  <script defer src="ui.js"></script>
-  <script defer src="renderer.js"></script>
-</head>
-
-<body>
-  <h1 id="title">Not set</h1>
-  <div id="container">
-    <div id="timer">00:00:00</div>
-    <div id="buttons">
-      <button id="start" class="disabled">Start</button>
-      <button id="stop">Stop</button>
-      <button id="clear" class="disabled">Clear</button>
-    </div>
-  </div>
-
-  <div id="timerForm">
-    <form action="">
-      <div id="inputs">
-        <input type="number" name="hours" />
-        <label for="minutes">:</label>
-        <input type="number" name="minutes" />
-        <label for="seconds">:</label>
-        <input type="number" name="seconds" />
+  <body>
+    <div id="container">
+      <h1 id="title">Not set</h1>
+      <div id="timer">00:00:00</div>
+      <div id="buttons">
+        <button id="start" class="disabled">Start</button>
+        <button id="stop">Stop</button>
+        <button id="clear" class="disabled">Clear</button>
       </div>
-      <button type="button" id="setTimer">Set Timer</button>
-    </form>
-  </div>
 
-  <div class="timer-modes-pill" role="radiogroup">
-    <div id="highlight"></div>
+      <div id="timerForm">
+        <form action="">
+          <div id="inputs">
+            <input type="number" name="hours" />
+            <label for="minutes">:</label>
+            <input type="number" name="minutes" />
+            <label for="seconds">:</label>
+            <input type="number" name="seconds" />
+          </div>
+          <button type="button" id="setTimer">Set Timer</button>
+        </form>
+      </div>
 
-    <button class="toggle-option active" type="button" data-mode="clock" aria-pressed="true">
-      Clock
-    </button>
+      <div class="timer-modes-pill" role="radiogroup">
+        <div id="highlight"></div>
 
-    <button class="toggle-option" type="button" data-mode="instant" aria-pressed="true">
-      Instant
-    </button>
-  </div>
-</body>
+        <button
+          class="toggle-option"
+          type="button"
+          data-mode="instant"
+          aria-pressed="true"
+        >
+          Instant
+        </button>
 
+        <button
+          class="toggle-option active"
+          type="button"
+          data-mode="clock"
+          aria-pressed="true"
+        >
+          Clock
+        </button>
+      </div>
+    </div>
+
+    <div id="settings">
+      <div id="settings-icon">
+        <div id="cog" aria-label="Open settings">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+            <rect width="256" height="256" fill="none" />
+            <circle
+              cx="128"
+              cy="128"
+              r="40"
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="16"
+            />
+            <path
+              d="M130.05,206.11c-1.34,0-2.69,0-4,0L94,224a104.61,104.61,0,0,1-34.11-19.2l-.12-36c-.71-1.12-1.38-2.25-2-3.41L25.9,147.24a99.15,99.15,0,0,1,0-38.46l31.84-18.1c.65-1.15,1.32-2.29,2-3.41l.16-36A104.58,104.58,0,0,1,94,32l32,17.89c1.34,0,2.69,0,4,0L162,32a104.61,104.61,0,0,1,34.11,19.2l.12,36c.71,1.12,1.38,2.25,2,3.41l31.85,18.14a99.15,99.15,0,0,1,0,38.46l-31.84,18.1c-.65,1.15-1.32,2.29-2,3.41l-.16,36A104.58,104.58,0,0,1,162,224Z"
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="16"
+            />
+          </svg>
+        </div>
+
+        <div id="chevron">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+            <rect width="256" height="256" fill="none" />
+            <polyline
+              points="96 48 176 128 96 208"
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="16"
+            />
+          </svg>
+        </div>
+      </div>
+
+      <div id="settings-panel" aria-hidden="true">
+        <h4>Settings</h4>
+
+        <h4>Settings</h4>
+        <h4>Settings</h4>
+        <h4>Settings</h4>
+        <h4>Settings</h4>
+      </div>
+    </div>
+  </body>
 </html>
+

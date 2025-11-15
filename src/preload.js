@@ -27,6 +27,60 @@ async function saveTime(time) {
   }
 }
 
+async function saveSettings(key, value) {
+  try {
+    // Validate settings keys to prevent injection attacks
+    const validKeys = [
+      "volume",
+      "vibration",
+      "showTitle",
+      "showEndTimer",
+      "mode",
+    ];
+    if (!validKeys.includes(key)) {
+      throw new Error("Invalid settings key:", key);
+    }
+
+    // Validate volume value
+    if (
+      key === "volume" &&
+      (typeof value !== "number" || value < 0 || value > 1)
+    ) {
+      throw new Error("Invalid volume value:", value);
+    }
+
+    await ipcRenderer.invoke("store-set", `settings.${key}`, value);
+  } catch (e) {
+    console.error("Failed to save settings:", e);
+  }
+}
+
+async function loadAllSettings() {
+  try {
+    // Load each setting with fallback
+    const [volume, vibration, showTitle, showEndTimer, mode] =
+      await Promise.all([
+        ipcRenderer.invoke("store-get", "settings.volume", 0.5),
+        ipcRenderer.invoke("store-get", "settings.vibration", true),
+        ipcRenderer.invoke("store-get", "settings.showTitle", true),
+        ipcRenderer.invoke("store-get", "settings.showEndTimer", true),
+        ipcRenderer.invoke("store-get", "settings.mode", "instant"),
+      ]);
+
+    return { volume, vibration, showTitle, showEndTimer, mode };
+  } catch (e) {
+    console.warn("Failed to load settings, using defaults:", e);
+    return {
+      volume: 0.5,
+      vibration: true,
+      showTitle: true,
+      showEndTimer: true,
+      mode: "instant",
+    };
+  }
+}
+
+// SOON WILL BE REDUNDANT --->
 async function loadMode() {
   try {
     const mode = await ipcRenderer.invoke("store-get", "mode", DEFAULT_MODE);
@@ -48,6 +102,7 @@ async function saveMode(mode) {
     console.error("Failed to save mode:", e);
   }
 }
+// <--- SOON WILL BE REDUNDANT
 
 contextBridge.exposeInMainWorld("electronAPI", {
   onResume: (cb) => ipcRenderer.on("resume", cb),
@@ -65,6 +120,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
     loadMode,
     saveTime,
     saveMode,
+    saveSettings,
+    loadAllSettings,
   },
 
   constants: {

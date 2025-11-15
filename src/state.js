@@ -19,7 +19,7 @@ const initialState = {
     volume: 0.5, // TODO: Add slider for the volume
     vibration: false, // Future TODO: add vibration for mobile
     showTitle: true,
-    hideEndTimer: false, // Counter after timer ends
+    showEndTimer: true, // Counter after timer ends
     mode: "instant", // Move mode here
   },
 };
@@ -43,6 +43,16 @@ function subscribe(listener) {
 function updateState(partialState) {
   currentState = { ...currentState, ...partialState };
   listeners.forEach((fn) => fn(currentState));
+}
+
+function toggleSettings() {
+  const isSettingsOpen = !currentState.settings.isOpen;
+  updateState({
+    settings: {
+      ...currentState.settings,
+      isOpen: isSettingsOpen,
+    },
+  });
 }
 
 function setTime(time) {
@@ -170,6 +180,7 @@ function updateTitle(title) {
 window.state = {
   getState,
   subscribe,
+  toggleSettings,
   setTime,
   updateDisplayTime,
   startTimer,

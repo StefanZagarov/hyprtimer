@@ -15,6 +15,7 @@ const setTimerButton = document.getElementById("setTimer");
 const timerModeBtns = document.querySelectorAll(".toggle-option");
 const highlight = document.getElementById("highlight");
 const titleEl = document.getElementById("title");
+const settings = document.getElementById("settings");
 
 // --- Timer cleanup reference ---
 let cancelCountdown = null;
@@ -58,6 +59,12 @@ function render(currentState) {
     highlight.style.width = `${activeBtn.offsetWidth + 1}px`;
     highlight.style.transform = `translateX(${activeBtn.offsetLeft}px)`;
   }
+
+  // Toggle the settings' open class based on state
+  ["chevron", "settings-panel"].forEach((id) => {
+    const element = document.getElementById(id);
+    element.classList.toggle("open", currentState.settings.isOpen);
+  });
 }
 
 function syncButton(el, config) {
@@ -90,6 +97,8 @@ function setupEventListeners() {
       }
     });
   });
+
+  settings.addEventListener("click", handleToggleSettings);
 }
 
 function handleStartClick() {
@@ -121,7 +130,12 @@ function handleStopClick() {
   window.state.pauseTimer();
 }
 
-// --- Form Handling (unchanged) ---
+// Settings handling
+function handleToggleSettings() {
+  window.state.toggleSettings();
+}
+
+// Form Handling
 function openTimerForm() {
   container.style.display = "none";
   timerFormContainer.style.display = "flex";
@@ -172,7 +186,6 @@ function handleClearClick() {
   }
 }
 
-// --- Export to global scope ---
 window.ui = {
   setupUI,
   updateDisplayTime: window.state.updateDisplayTime,
