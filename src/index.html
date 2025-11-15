@@ -1,11 +1,16 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
 
 <head>
   <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; media-src 'self';" />
   <title>Hyprtimer</title>
   <link rel="stylesheet" href="index.css" />
+  <script defer src="state.js"></script>
   <script defer src="timer.js"></script>
+  <script defer src="ui.js"></script>
+  <script defer src="renderer.js"></script>
 </head>
 
 <body>
@@ -42,7 +47,6 @@
     <button class="toggle-option" type="button" data-mode="instant" aria-pressed="true">
       Instant
     </button>
-
   </div>
 </body>
 

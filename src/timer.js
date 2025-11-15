@@ -1,315 +1,49 @@
-// === DOM ELEMENTS ===
-// Get references to key UI elements for manipulation
-const container = document.getElementById("container");
-const timerFormContainer = document.getElementById("timerForm");
-const form = document.querySelector("form");
-const timerDisplay = document.getElementById("timer");
-const startButton = document.getElementById("start");
-const stopButton = document.getElementById("stop");
-const clearButton = document.getElementById("clear");
-const setTimerButton = document.getElementById("setTimer");
-const timerModeBtns = document.querySelectorAll(".toggle-option");
-const highlight = document.getElementById("highlight");
-const title = document.getElementById("title");
+// src/timer.js
+// Access state and ui through global objects
+// state is available as window.state
+// ui is available as window.ui
 
-// TODO: See if you can figure out how to set classes like disableTimerClick, enable and disable different buttons, change title text, etc, based on the current state, this is avery state-driven app
-
-// === TIMER STATE MACHINE ===
-// Defines all possible states the timer can be in
-
-// This prevents invalid transitions (e.g., starting a finished timer)
-const timerState = {
-  IDLE: `idle`,
-  RUNNING: `running`,
-  PAUSED: `paused`,
-  FINISHED: `finished`,
-};
-let timeSet = `00:00:00`;
-
-async function initialize() {
-  const loadedTime = await window.electronAPI.store.get(`timeSet`, `00:00:00`);
-
-  timerDisplay.textContent = loadedTime;
-  timeSet = loadedTime;
-
-  if (loadedTime !== "00:00:00") {
-    title.textContent = "Timer set";
-    enableButton(startButton, "start");
-    enableButton(clearButton, "clear");
-  } else {
-    title.textContent = "Not set";
-    disableButton(startButton);
-    disableButton(clearButton);
-  }
-
-  const mode = await window.electronAPI.store.get(`mode`, `clock`);
-  const modeButton = await Array.from(timerModeBtns).find(
-    (btn) => btn.dataset.mode === mode,
-  );
-  setTimerMode(modeButton);
-}
-initialize().catch(console.error);
-
+// Assume timeUpSound is accessible globally or via module
+// If you prefer, move this into a sound.js module later
 const timeUpSound = new Audio("./assets/alarms/jobs done.mp3");
 
-// Start in idle state
-let state = timerState.IDLE;
-
-// Stores the original time the user set (e.g., "01:30:00")
-// Used to reset from the same duration
-
-// Holds a reference to the cleanup function returned by countDown()
-// Allows safe cancellation of the current countdown
-let cancelCountdown = null;
-
-// Store the timer mode
-let currentTimerMode = timerModeBtns[0].dataset.mode;
-
-// ================================
-// EVENT LISTENERS
-// ================================
-
-// === FORM INTERACTIONS ===
-// Clicking the timer display opens the edit form
-timerDisplay.addEventListener("click", handleTimerForm);
-
-// Input fields update in real-time and validate input
-form.elements.hours.addEventListener("input", handleFormInput);
-form.elements.minutes.addEventListener("input", handleFormInput);
-form.elements.seconds.addEventListener("input", handleFormInput);
-
-// === BUTTON CLICK HANDLERS ===
-// Apply actions when buttons are clicked
-setTimerButton.addEventListener("click", handleSetTimer); // Save edited time
-clearButton.addEventListener("click", handleResetTimer); // Reset timer based on current state
-startButton.addEventListener("click", handleStartTimer); // Start or resume countdown
-stopButton.addEventListener("click", handleStopTimer); // Pause the running timer
-
-timerModeBtns.forEach((button) => {
-  button.addEventListener("click", handleTimerMode);
-});
-// ================================
-// FUNCTIONS
-// ================================
-
-/** Sets the Clock and Instant modes */
-function handleTimerMode(e) {
-  const btn = e.currentTarget;
-
-  if (btn.dataset.mode === currentTimerMode) return;
-  setTimerMode(btn);
-}
-
-function setTimerMode(btn) {
-  timerModeBtns.forEach((button) => {
-    const isActive = button.dataset.mode === btn.dataset.mode;
-
-    button.classList.toggle("active", isActive);
-    button.setAttribute("aria-pressed", isActive);
-  });
-
-  highlight.style.width = `${btn.offsetWidth + 1}px`;
-  highlight.style.transform = `translateX(${btn.offsetLeft}px)`;
-
-  currentTimerMode = btn.dataset.mode;
-
-  window.electronAPI.store.set(`mode`, currentTimerMode);
-}
-
 /**
- * Opens the time edit form when the user clicks the timer display.
- * Pre-fills the form with the current displayed time.
- */
-function handleTimerForm() {
-  container.style.display = "none"; // Hide main timer view
-
-  // Extract current time from display (HH:MM:SS)
-  const hours = timerDisplay.textContent.split(":")[0];
-  const minutes = timerDisplay.textContent.split(":")[1];
-  const seconds = timerDisplay.textContent.split(":")[2];
-
-  // Populate form fields
-  form.elements.hours.value = hours;
-  form.elements.minutes.value = minutes;
-  form.elements.seconds.value = seconds;
-
-  // Show the form
-  timerFormContainer.style.display = "flex";
-}
-
-/**
- * Handles real-time input validation in the time form.
- * - Limits input to 2 digits
- * - Caps minutes/seconds at 59
- * - Auto-pads single-digit values with a leading zero
- */
-function handleFormInput(input) {
-  const target = input.target.name;
-
-  // Prevent more than 2 digits
-  if (form.elements[target].value.length > 2) {
-    form.elements[target].value = form.elements[target].value.slice(1);
-  }
-
-  // Ensure minutes and seconds don't exceed 59
-  if (
-    (target === "minutes" || target === "seconds") &&
-    form.elements[target].value > 59
-  ) {
-    form.elements[target].value = 59;
-  }
-
-  // Auto-pad with '0' if single digit
-  if (form.elements[target].value.length < 2) {
-    form.elements[target].value = "0" + form.elements[target].value;
-  }
-}
-
-/**
- * Saves the time from the form and updates the display.
- * Shows/hides UI elements appropriately.
- * Enables start/clear buttons unless time is zero.
- */
-function handleSetTimer() {
-  // Save the formatted time string
-  timeSet = `${form.elements.hours.value}:${form.elements.minutes.value}:${form.elements.seconds.value}`;
-
-  // Update the main display
-  timerDisplay.textContent = timeSet;
-
-  // Switch back to main view
-  timerFormContainer.style.display = "none";
-  container.style.display = "flex";
-
-  // Reset button labels and enable controls
-  clearButton.textContent = "Clear";
-  enableButton(startButton, "start");
-  enableButton(clearButton, "clear");
-
-  title.textContent = "Timer set";
-  // Disable start/clear if time is zero
-  if (timeSet === "00:00:00") {
-    title.textContent = "Not set";
-    disableButton(startButton);
-    disableButton(clearButton);
-  }
-
-  window.electronAPI.store.set(`timeSet`, timeSet);
-}
-
-/**
- * Handles resetting the timer based on current state:
- * - FINISHED → Reset to original time, ready to restart
- * - IDLE → Clear to 00:00:00 and disable buttons
- * - PAUSED → Reset to original time, go back to idle
- */
-function handleResetTimer() {
-  // Cancel any active countdown (cleanup)
-  if (cancelCountdown) cancelCountdown();
-  cancelCountdown = null;
-
-  if (state == timerState.FINISHED) {
-    state = timerState.IDLE;
-    timerDisplay.textContent = timeSet; // Restore original time
-
-    clearButton.textContent = "Clear";
-    hideButton(stopButton);
-    showButton(startButton);
-  } else if (state === timerState.IDLE) {
-    timerDisplay.textContent = "00:00:00";
-    disableButton(startButton);
-    disableButton(clearButton);
-  } else if (state === timerState.PAUSED) {
-    timerDisplay.textContent = timeSet;
-    state = timerState.IDLE;
-    clearButton.textContent = "Clear";
-  }
-
-  title.textContent = "Timer set";
-  timerDisplay.classList.remove("disableTimerClick");
-  timerModeBtns.forEach((btn) => btn.classList.remove("disableTimerClick"));
-}
-
-/**
- * Starts the countdown:
- * - Validates time is not zero
- * - Updates UI: hides start, shows stop, disables clear
- * - Calculates end time in milliseconds from now
- * - Enters RUNNING state
- * - Launches the countDown() engine
- */
-function handleStartTimer() {
-  if (timerDisplay.textContent === "00:00:00") return;
-  // Redundant under normal circumstances, but just in case: If the timer is already running, don't start it again
-  if (cancelCountdown) return;
-
-  // Update UI: hide start, show stop, disable clear
-  hideButton(startButton);
-  enableButton(stopButton, "stop");
-  showButton(stopButton);
-  disableButton(clearButton);
-  clearButton.textContent = "Reset";
-
-  let displayTime = timerDisplay.textContent;
-  let endTime = `0`;
-
-  let [hours, minutes, seconds] = [0, 0, 0];
-
-  // If starting from idle, use the saved time; otherwise, use current display
-  if (state == timerState.IDLE) {
-    [hours, minutes, seconds] = timeSet.split(`:`).map(Number);
-  } else {
-    [hours, minutes, seconds] = displayTime.split(`:`).map(Number);
-  }
-
-  // Convert total time to milliseconds
-  const setTimeInMilliseconds = (hours * 3600 + minutes * 60 + seconds) * 1000;
-  // Calculate absolute end time (wall-clock time when timer should finish)
-  endTime = Date.now() + setTimeInMilliseconds;
-
-  // Enter running state
-  state = timerState.RUNNING;
-  timerDisplay.classList.add("disableTimerClick");
-  timerModeBtns.forEach((btn) => btn.classList.add(`disableTimerClick`));
-
-  // Start the countdown engine and store its cleanup function
-  cancelCountdown = countDown(endTime);
-}
-
-/**
- * The core countdown engine.
- * Uses real-time calculation to avoid drift and supports two timing modes:
+ * Starts a countdown timer that updates based on real wall-clock time.
+ * Preserves your original timing logic for "clock" and "instant" modes.
  *
- * 1. **Clock Mode**: Aligns updates to wall-clock seconds (e.g., :005 of each second)
- *
- * 2. **Instant Mode**: Anchors updates to the exact millisecond the timer started
- *
- * @param {number} endTime - Absolute timestamp (from `Date.now()`) when timer should finish
- * @returns {function} Cleanup function to safely stop the timer and unregister listeners
+ * @param {number} endTime - Absolute timestamp (Date.now() + durationMs) when timer should end
+ * @returns {function} Cleanup function to stop the timer
  */
 function countDown(endTime) {
   const startTime = Date.now();
-
-  title.textContent = "Running...";
-
-  let timer = 0;
-
+  let timerId = null;
   let lastSec = -1;
 
+  // Update title to "Running..."
+  window.ui.updateTitle("Running...");
+
   const tick = () => {
-    if (state === timerState.FINISHED) return;
+    // Guard: stop if already finished (e.g., cleared externally)
+    if (window.state.getState().state === "finished") {
+      return;
+    }
 
-    const left = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
+    const now = Date.now();
+    const left = Math.max(0, Math.ceil((endTime - now) / 1000));
 
+    // Only update display when second changes
     if (left !== lastSec) {
       lastSec = left;
 
       const h = String(Math.floor(left / 3600)).padStart(2, "0");
       const m = String(Math.floor((left % 3600) / 60)).padStart(2, "0");
       const s = String(left % 60).padStart(2, "0");
-      timerDisplay.textContent = `${h}:${m}:${s}`;
+      const displayTime = `${h}:${m}:${s}`;
 
-      console.log(left, Date.now(), currentTimerMode);
+      window.ui.updateDisplayTime(displayTime);
+
+      // Debug log (you can remove or guard with env flag)
+      console.log(left, now, window.state.getState().mode);
 
       if (left === 0) {
         finishTimer();
@@ -317,107 +51,92 @@ function countDown(endTime) {
       }
     }
 
+    // Compute next tick delay based on mode
     let delay = 0;
+    const currentMode = window.state.getState().mode;
 
-    if (currentTimerMode === "clock") {
-      delay = 1000 - (Date.now() % 1000) + 5;
-    } else if (currentTimerMode === "instant") {
+    if (currentMode === "clock") {
+      delay = 1000 - (Date.now() % 1000) + 5; // your original +5ms tweak
+    } else if (currentMode === "instant") {
       const elapsed = Date.now() - startTime;
       const nextTickTime = startTime + Math.ceil((elapsed + 1) / 1000) * 1000;
       delay = Math.max(0, nextTickTime - Date.now());
     }
 
-    timer = setTimeout(tick, delay);
+    timerId = setTimeout(tick, delay);
   };
 
   const finishTimer = () => {
-    state = timerState.FINISHED;
+    // Clear timeout
+    if (timerId) {
+      clearTimeout(timerId);
+      timerId = null;
+    }
 
-    clearTimeout(timer);
-
+    // Unregister from Electron resume
     window.electronAPI.removeResume(tick);
 
-    disableButton(stopButton);
-    clearButton.textContent = "Reset";
-    enableButton(clearButton, "clear");
+    // Transition state
+    window.state.finishTimer();
 
-    timeUpSound.play();
+    // Play sound
+    timeUpSound.play().catch((e) => console.warn("Audio play failed:", e));
+
+    // Start "time since finished" counter
     timeSinceFinishedCount();
   };
 
+  // Start ticking
   tick();
 
+  // Register for system resume (e.g., after sleep)
   window.electronAPI.onResume(tick);
 
+  // Return cleanup function
   return () => {
-    clearTimeout(timer);
+    if (timerId) {
+      clearTimeout(timerId);
+      timerId = null;
+    }
     window.electronAPI.removeResume(tick);
   };
 }
 
+/**
+ * Counts upward from 00:00:00 showing "Time since stopped: HH:MM:SS"
+ */
 function timeSinceFinishedCount() {
   const startTime = Date.now();
-  let timerId = null;
+  let _timerId = null;
 
   const tick = () => {
-    if (state !== timerState.FINISHED) return;
+    // Stop if no longer in FINISHED state
+    if (window.state.getState().state !== "finished") {
+      return;
+    }
 
-    const elapsed = Date.now() - startTime;
-    const totalSeconds = Math.floor(elapsed / 1000);
+    const elapsedMs = Date.now() - startTime;
+    const totalSeconds = Math.floor(elapsedMs / 1000);
 
     const h = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
     const m = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
     const s = String(totalSeconds % 60).padStart(2, "0");
 
-    title.textContent = `Time since stopped: ${h}:${m}:${s}`;
+    window.ui.updateTitle(`Time since stopped: ${h}:${m}:${s}`);
 
-    // Add Math.max(0, ...) to nextTick to avoid negative delays (though unlikely, it’s defensive)
-    const nextTick = Math.max(0, 1000 - (elapsed % 1000));
-    timerId = setTimeout(tick, nextTick);
+    const nextTickDelay = Math.max(0, 1000 - (elapsedMs % 1000));
+    _timerId = setTimeout(tick, nextTickDelay);
   };
 
   tick();
-
-  // Ensure timer resumes after system sleep / app backgrounding
   window.electronAPI.onResume(tick);
 
-  return () => {
-    clearTimeout(timerId);
-    window.electronAPI.removeResume(tick);
-  };
+  // Optional: return cleanup if needed externally
+  // For now, it self-terminates when state changes
 }
 
-function handleStopTimer() {
-  state = timerState.PAUSED;
-
-  title.textContent = "Paused";
-
-  if (cancelCountdown) cancelCountdown();
-  cancelCountdown = null;
-
-  hideButton(stopButton);
-  showButton(startButton);
-  enableButton(clearButton, "clear");
-}
-
-// ================================
-// BUTTON MANAGEMENT FUNCTIONS
-// ================================
-
-function disableButton(button) {
-  button.classList.add("disabled");
-  button.disabled = true;
-}
-
-function enableButton(button) {
-  button.classList.remove("disabled");
-  button.disabled = false;
-}
-
-function hideButton(button) {
-  button.style.display = "none";
-}
-
-function showButton(button) {
-  button.style.display = "flex";
-}
+// Export to global scope
+window.timer = {
+  countDown,
+  // timeSinceFinishedCount is internal, but you can export if needed
+};

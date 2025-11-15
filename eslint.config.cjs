@@ -14,6 +14,9 @@ module.exports = [
         document: "readonly",
         navigator: "readonly",
         console: "readonly",
+        Audio: "readonly",
+        setTimeout: "readonly",
+        clearTimeout: "readonly",
         // Node/Electron globals
         require: "readonly",
         module: "readonly",
