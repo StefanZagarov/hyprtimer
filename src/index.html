@@ -15,49 +15,27 @@
   </head>
 
   <body>
-    <div id="container">
-      <h1 id="title">Not set</h1>
+    <h1 id="title">Not set</h1>
+    <div id="display-container">
       <div id="timer">00:00:00</div>
       <div id="buttons">
         <button id="start" class="disabled">Start</button>
         <button id="stop">Stop</button>
         <button id="clear" class="disabled">Clear</button>
       </div>
+    </div>
 
-      <div id="timerForm">
-        <form action="">
-          <div id="inputs">
-            <input type="number" name="hours" />
-            <label for="minutes">:</label>
-            <input type="number" name="minutes" />
-            <label for="seconds">:</label>
-            <input type="number" name="seconds" />
-          </div>
-          <button type="button" id="setTimer">Set Timer</button>
-        </form>
-      </div>
-
-      <div class="timer-modes-pill" role="radiogroup">
-        <div id="highlight"></div>
-
-        <button
-          class="toggle-option"
-          type="button"
-          data-mode="instant"
-          aria-pressed="true"
-        >
-          Instant
-        </button>
-
-        <button
-          class="toggle-option active"
-          type="button"
-          data-mode="clock"
-          aria-pressed="true"
-        >
-          Clock
-        </button>
-      </div>
+    <div id="timerForm">
+      <form action="">
+        <div id="inputs">
+          <input type="number" name="hours" />
+          <label for="minutes">:</label>
+          <input type="number" name="minutes" />
+          <label for="seconds">:</label>
+          <input type="number" name="seconds" />
+        </div>
+        <button type="button" id="setTimer">Set Timer</button>
+      </form>
     </div>
 
     <div id="settings">
@@ -102,14 +80,106 @@
       </div>
 
       <div id="settings-panel" aria-hidden="true">
-        <h4>Settings</h4>
+        <div class="setting">
+          <label id="toggle-label" class="capsule">
+            <div class="toggle-container">
+              <input
+                type="checkbox"
+                id="vibration-toggle"
+                class="toggle-input"
+              />
+              <div class="toggle-slider"></div>
+            </div>
+          </label>
 
-        <h4>Settings</h4>
-        <h4>Settings</h4>
-        <h4>Settings</h4>
-        <h4>Settings</h4>
+          <div class="settings-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+              <rect width="256" height="256" fill="none" />
+              <rect
+                x="40"
+                y="80"
+                width="176"
+                height="96"
+                rx="16"
+                transform="translate(256) rotate(90)"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="16"
+              />
+              <line
+                x1="208"
+                y1="88"
+                x2="208"
+                y2="168"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="16"
+              />
+              <line
+                x1="240"
+                y1="104"
+                x2="240"
+                y2="152"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="16"
+              />
+              <line
+                x1="48"
+                y1="88"
+                x2="48"
+                y2="168"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="16"
+              />
+              <line
+                x1="16"
+                y1="104"
+                x2="16"
+                y2="152"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="16"
+              />
+            </svg>
+          </div>
+        </div>
+
+        <div class="setting">
+          <div class="timer-modes-pill" role="radiogroup">
+            <div id="highlight"></div>
+
+            <button
+              class="toggle-option"
+              type="button"
+              data-mode="instant"
+              aria-pressed="true"
+            >
+              Instant
+            </button>
+
+            <button
+              class="toggle-option active"
+              type="button"
+              data-mode="clock"
+              aria-pressed="true"
+            >
+              Clock
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </body>
 </html>
-

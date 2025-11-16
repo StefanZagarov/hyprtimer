@@ -45,7 +45,7 @@ function updateState(partialState) {
   listeners.forEach((fn) => fn(currentState));
 }
 
-function toggleSettings() {
+function toggleSettingsPanel() {
   const isSettingsOpen = !currentState.settings.isOpen;
   updateState({
     settings: {
@@ -53,6 +53,33 @@ function toggleSettings() {
       isOpen: isSettingsOpen,
     },
   });
+}
+
+function updateSetting(key, value, loadedFromStorage = false) {
+  updateState({
+    settings: {
+      ...currentState.settings,
+      [key]: value,
+    },
+  });
+
+  if (!loadedFromStorage) window.electronAPI.storage.saveSetting(key, value);
+}
+
+function loadSettings(settings) {
+  let name = "";
+  let value = "";
+  try {
+    Object.entries(settings).forEach((setting) => {
+      const name = setting[0];
+      const value = setting[1];
+      updateSetting(name, value, true);
+    });
+  } catch (error) {
+    console.warn(
+      `Failed to load setting ${name} with value ${value}, resolving to default value. Error message:${error}`,
+    );
+  }
 }
 
 function setTime(time) {
@@ -180,7 +207,9 @@ function updateTitle(title) {
 window.state = {
   getState,
   subscribe,
-  toggleSettings,
+  toggleSettingsPanel,
+  updateSetting,
+  loadSettings,
   setTime,
   updateDisplayTime,
   startTimer,

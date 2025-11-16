@@ -27,7 +27,7 @@ async function saveTime(time) {
   }
 }
 
-async function saveSettings(key, value) {
+async function saveSetting(key, value) {
   try {
     // Validate settings keys to prevent injection attacks
     const validKeys = [
@@ -55,7 +55,7 @@ async function saveSettings(key, value) {
   }
 }
 
-async function loadAllSettings() {
+async function loadSettings() {
   try {
     // Load each setting with fallback
     const [volume, vibration, showTitle, showEndTimer, mode] =
@@ -120,8 +120,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
     loadMode,
     saveTime,
     saveMode,
-    saveSettings,
-    loadAllSettings,
+    saveSetting,
+    loadSettings,
   },
 
   constants: {

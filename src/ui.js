@@ -4,7 +4,7 @@
 // saveTime and saveMode are available through window.electronAPI.storage
 
 // --- DOM Elements ---
-const container = document.getElementById("container");
+const displayContainer = document.getElementById("display-container");
 const timerFormContainer = document.getElementById("timerForm");
 const form = document.querySelector("form");
 const timerDisplay = document.getElementById("timer");
@@ -15,7 +15,8 @@ const setTimerButton = document.getElementById("setTimer");
 const timerModeBtns = document.querySelectorAll(".toggle-option");
 const highlight = document.getElementById("highlight");
 const titleEl = document.getElementById("title");
-const settings = document.getElementById("settings");
+const settingsIcon = document.getElementById("settings-icon");
+const vibrationToggle = document.getElementById("vibration-toggle");
 
 // --- Timer cleanup reference ---
 let cancelCountdown = null;
@@ -50,21 +51,34 @@ function render(currentState) {
     const isActive = btn.dataset.mode === currentState.mode;
     btn.classList.toggle("active", isActive);
     btn.setAttribute("aria-pressed", isActive.toString());
+    updateHighlightPosition();
   });
-
-  const activeBtn = Array.from(timerModeBtns).find(
-    (btn) => btn.dataset.mode === currentState.mode,
-  );
-  if (activeBtn) {
-    highlight.style.width = `${activeBtn.offsetWidth + 1}px`;
-    highlight.style.transform = `translateX(${activeBtn.offsetLeft}px)`;
-  }
 
   // Toggle the settings' open class based on state
   ["chevron", "settings-panel"].forEach((id) => {
     const element = document.getElementById(id);
     element.classList.toggle("open", currentState.settings.isOpen);
   });
+
+  // Settings UI elements linkage to the state
+  vibrationToggle.checked = currentState.settings.vibration;
+}
+
+function updateHighlightPosition(initial = false) {
+  const currentState = window.state.getState();
+  const activeBtn = Array.from(timerModeBtns).find(
+    (btn) => btn.dataset.mode === currentState.mode,
+  );
+
+  if (activeBtn && initial) {
+    highlight.style.transition = "none";
+    highlight.style.width = `${activeBtn.offsetWidth + 1}px`;
+    highlight.style.transform = `translateX(${activeBtn.offsetLeft}px)`;
+  } else if (activeBtn) {
+    highlight.style.transition = "transform 0.3s ease";
+    highlight.style.width = `${activeBtn.offsetWidth + 1}px`;
+    highlight.style.transform = `translateX(${activeBtn.offsetLeft}px)`;
+  }
 }
 
 function syncButton(el, config) {
@@ -98,7 +112,11 @@ function setupEventListeners() {
     });
   });
 
-  settings.addEventListener("click", handleToggleSettings);
+  settingsIcon.addEventListener("click", handleToggleSettingsPanel);
+  //TODO: Make an object which will be used to make sure we send the proper setting names (type safety)
+  vibrationToggle.addEventListener("change", (e) => {
+    handleToggleSetting("vibration", e);
+  });
 }
 
 function handleStartClick() {
@@ -131,13 +149,18 @@ function handleStopClick() {
 }
 
 // Settings handling
-function handleToggleSettings() {
-  window.state.toggleSettings();
+function handleToggleSettingsPanel() {
+  window.state.toggleSettingsPanel();
+  updateHighlightPosition(true);
+}
+
+function handleToggleSetting(setting, event) {
+  window.state.updateSetting(setting, event.target.checked);
 }
 
 // Form Handling
 function openTimerForm() {
-  container.style.display = "none";
+  displayContainer.style.display = "none";
   timerFormContainer.style.display = "flex";
 
   const [h, m, s] = window.state.getState().displayTime.split(":");
@@ -166,7 +189,7 @@ function handleFormInput(e) {
 function handleSetTimer() {
   const timeString = `${form.elements.hours.value}:${form.elements.minutes.value}:${form.elements.seconds.value}`;
   timerFormContainer.style.display = "none";
-  container.style.display = "flex";
+  displayContainer.style.display = "flex";
   window.state.setTime(timeString);
   window.electronAPI.storage.saveTime(timeString);
 }
