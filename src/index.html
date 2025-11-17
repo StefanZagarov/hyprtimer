@@ -12,6 +12,7 @@
     <script defer src="timer.js"></script>
     <script defer src="ui.js"></script>
     <script defer src="renderer.js"></script>
+    <script defer src="audio.js"></script>
   </head>
 
   <body>
@@ -81,7 +82,7 @@
 
       <div id="settings-panel" aria-hidden="true">
         <div class="setting">
-          <label id="toggle-label" class="capsule">
+          <label for="vibration-toggle" id="toggle-label" class="capsule">
             <div class="toggle-container">
               <input
                 type="checkbox"
@@ -146,6 +147,59 @@
                 y1="104"
                 x2="16"
                 y2="152"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="16"
+              />
+            </svg>
+          </div>
+        </div>
+
+        <div class="setting">
+          <label for="volume-slider">
+            <div class="slider-container">
+              <span class="volume-value">100%</span>
+              <input
+                type="range"
+                id="volume-slider"
+                min="0"
+                max="1"
+                step="0.01"
+                value="1.0"
+                aria-label="Volume control"
+              />
+            </div>
+          </label>
+
+          <div class="settings-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+              <rect width="256" height="256" fill="none" />
+              <path
+                d="M88,168H40a8,8,0,0,1-8-8V96a8,8,0,0,1,8-8H88l72-56V224Z"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="16"
+              />
+              <line
+                x1="200"
+                y1="104"
+                x2="200"
+                y2="152"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="16"
+              />
+              <line
+                x1="232"
+                y1="88"
+                x2="232"
+                y2="168"
                 fill="none"
                 stroke="currentColor"
                 stroke-linecap="round"

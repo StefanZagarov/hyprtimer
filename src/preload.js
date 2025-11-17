@@ -80,6 +80,7 @@ async function loadSettings() {
   }
 }
 
+// TODO: Clean this and use the setting's clock mode logic
 // SOON WILL BE REDUNDANT --->
 async function loadMode() {
   try {

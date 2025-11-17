@@ -1,13 +1,16 @@
-// TODO: Make sure inputting letters is prohibited
-// TODO: Maybe let maxed out fields (59) to change the 9 to the new number
-//
 // Use global objects and electronAPI for renderer process
 document.addEventListener("DOMContentLoaded", async () => {
   try {
     // Load persisted data using electronAPI
-    const time = await window.electronAPI.storage.loadTime();
-    const mode = await window.electronAPI.storage.loadMode();
-    const settings = await window.electronAPI.storage.loadSettings();
+    const [time, mode, settings] = await Promise.all([
+      await window.electronAPI.storage.loadTime(),
+      await window.electronAPI.storage.loadMode(),
+      await window.electronAPI.storage.loadSettings(),
+    ]);
+
+    if (window.audio) {
+      window.audio.initAudio({ settings });
+    }
 
     // Initialize state (available as window.state after state.js loads)
     window.state.setTime(time);

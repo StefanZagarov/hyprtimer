@@ -3,10 +3,6 @@
 // state is available as window.state
 // ui is available as window.ui
 
-// Assume timeUpSound is accessible globally or via module
-// If you prefer, move this into a sound.js module later
-const timeUpSound = new Audio("./assets/alarms/jobs done.mp3");
-
 /**
  * Starts a countdown timer that updates based on real wall-clock time.
  * Preserves your original timing logic for "clock" and "instant" modes.
@@ -80,7 +76,7 @@ function countDown(endTime) {
     window.state.finishTimer();
 
     // Play sound
-    timeUpSound.play().catch((e) => console.warn("Audio play failed:", e));
+    window.audio.playTimeUpSound();
 
     // Start "time since finished" counter
     timeSinceFinishedCount();

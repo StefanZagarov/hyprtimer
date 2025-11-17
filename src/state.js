@@ -16,8 +16,8 @@ const initialState = {
   },
   settings: {
     isOpen: false,
-    volume: 0.5, // TODO: Add slider for the volume
-    vibration: false, // Future TODO: add vibration for mobile
+    volume: 0.5,
+    vibration: false, // Future TODO: add vibration for mobile login in the time up logic
     showTitle: true,
     showEndTimer: true, // Counter after timer ends
     mode: "instant", // Move mode here
@@ -80,6 +80,11 @@ function loadSettings(settings) {
       `Failed to load setting ${name} with value ${value}, resolving to default value. Error message:${error}`,
     );
   }
+}
+
+function setVolume(volume) {
+  const validateVolume = Math.max(0, Math.min(1, volume));
+  updateSetting("volume", validateVolume);
 }
 
 function setTime(time) {
@@ -209,6 +214,7 @@ window.state = {
   subscribe,
   toggleSettingsPanel,
   updateSetting,
+  setVolume,
   loadSettings,
   setTime,
   updateDisplayTime,

@@ -17,6 +17,7 @@ const highlight = document.getElementById("highlight");
 const titleEl = document.getElementById("title");
 const settingsIcon = document.getElementById("settings-icon");
 const vibrationToggle = document.getElementById("vibration-toggle");
+const volumeSlider = document.getElementById("volume-slider");
 
 // --- Timer cleanup reference ---
 let cancelCountdown = null;
@@ -62,6 +63,15 @@ function render(currentState) {
 
   // Settings UI elements linkage to the state
   vibrationToggle.checked = currentState.settings.vibration;
+
+  // Volume slider
+  volumeSlider.value = currentState.settings.volume;
+  updateVolumeDisplay(currentState.settings.volume);
+}
+
+function updateVolumeDisplay(volume) {
+  const volumeValue = document.querySelector(".volume-value");
+  volumeValue.textContent = `${Math.round(volume * 100)}%`;
 }
 
 function updateHighlightPosition(initial = false) {
@@ -117,6 +127,13 @@ function setupEventListeners() {
   vibrationToggle.addEventListener("change", (e) => {
     handleToggleSetting("vibration", e);
   });
+
+  volumeSlider.addEventListener("input", (e) => {
+    const volume = parseFloat(e.target.value);
+    window.state.setVolume(volume);
+    window.audio.setVolume(volume);
+    updateVolumeDisplay(volume);
+  });
 }
 
 function handleStartClick() {
@@ -169,6 +186,8 @@ function openTimerForm() {
   form.elements.seconds.value = s;
 }
 
+// TODO: Make sure inputting letters is prohibited
+// TODO: Maybe let maxed out fields (59) to change the 9 to the new number
 function handleFormInput(e) {
   const field = e.target;
   const name = field.name;
