@@ -25,6 +25,13 @@ input {
   color: #7a97e7;
 }
 
+#container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 4rem;
+}
+
 #inputs {
   color: #7a97e7;
 }
@@ -131,7 +138,7 @@ button {
 }
 
 #timerForm #inputs {
-  margin-right: -2px;
+  margin-right: 1px;
 }
 
 #timerForm input {
@@ -361,8 +368,14 @@ input[type="number"]::-webkit-outer-spin-button {
   background: #7a97e7;
 }
 
-.volume-value{
-    min-width: 50px;
-    text-align: left;
-    color: #bababa;
+.volume-value {
+  min-width: 50px;
+  text-align: left;
+  color: #bababa;
+}
+
+#overtime {
+  font-size: 32px;
+  margin-top: 1rem;
+  color: #95abe9;
 }

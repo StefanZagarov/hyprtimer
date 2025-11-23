@@ -45,7 +45,7 @@ module.exports = [
       // Require error handling in promises
       "prefer-promise-reject-errors": "warn",
 
-      // Warn about console.log (you can remove this if you like using console)
+      // Warn about console.log
       "no-console": ["warn", { allow: ["warn", "error"] }],
     },
     ignores: [

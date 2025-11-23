@@ -7,6 +7,7 @@ const {
   DEFAULT_TIME,
   DEFAULT_MODE,
   MODES,
+  DEFAULT_OVERTIME,
 } = require("./constants");
 
 // Storage functions that use ipcRenderer directly
@@ -34,7 +35,7 @@ async function saveSetting(key, value) {
       "volume",
       "vibration",
       "showTitle",
-      "showEndTimer",
+      "showOvertime",
       "mode",
     ];
     if (!validKeys.includes(key)) {
@@ -58,52 +59,27 @@ async function saveSetting(key, value) {
 async function loadSettings() {
   try {
     // Load each setting with fallback
-    const [volume, vibration, showTitle, showEndTimer, mode] =
+    const [volume, vibration, showTitle, showOvertime, mode] =
       await Promise.all([
         ipcRenderer.invoke("store-get", "settings.volume", 0.5),
         ipcRenderer.invoke("store-get", "settings.vibration", true),
         ipcRenderer.invoke("store-get", "settings.showTitle", true),
-        ipcRenderer.invoke("store-get", "settings.showEndTimer", true),
+        ipcRenderer.invoke("store-get", "settings.showOvertime", true),
         ipcRenderer.invoke("store-get", "settings.mode", "instant"),
       ]);
 
-    return { volume, vibration, showTitle, showEndTimer, mode };
+    return { volume, vibration, showTitle, showOvertime, mode };
   } catch (e) {
     console.warn("Failed to load settings, using defaults:", e);
     return {
       volume: 0.5,
       vibration: true,
       showTitle: true,
-      showEndTimer: true,
+      showOvertime: true,
       mode: "instant",
     };
   }
 }
-
-// TODO: Clean this and use the setting's clock mode logic
-// SOON WILL BE REDUNDANT --->
-async function loadMode() {
-  try {
-    const mode = await ipcRenderer.invoke("store-get", "mode", DEFAULT_MODE);
-    // Ensure only valid modes are returned
-    return ["clock", "instant"].includes(mode) ? mode : DEFAULT_MODE;
-  } catch (e) {
-    console.warn("Failed to load stored mode, using default:", e);
-    return DEFAULT_MODE;
-  }
-}
-
-async function saveMode(mode) {
-  try {
-    if (!["clock", "instant"].includes(mode)) {
-      throw new Error(`Invalid mode: ${mode}`);
-    }
-    await ipcRenderer.invoke("store-set", "mode", mode);
-  } catch (e) {
-    console.error("Failed to save mode:", e);
-  }
-}
-// <--- SOON WILL BE REDUNDANT
 
 contextBridge.exposeInMainWorld("electronAPI", {
   onResume: (cb) => ipcRenderer.on("resume", cb),
@@ -118,9 +94,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 
   storage: {
     loadTime,
-    loadMode,
     saveTime,
-    saveMode,
     saveSetting,
     loadSettings,
   },
@@ -128,6 +102,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
   constants: {
     TIMER_STATE,
     DEFAULT_TIME,
+    DEFAULT_OVERTIME,
     DEFAULT_MODE,
     MODES,
   },

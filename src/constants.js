@@ -7,11 +7,13 @@ const TIMER_STATE = {
 const MODES = [`clock`, `instant`];
 
 const DEFAULT_TIME = `00:00:00`;
+const DEFAULT_OVERTIME = `00:00:00`;
 const DEFAULT_MODE = MODES[0];
 
 module.exports = {
   TIMER_STATE,
   DEFAULT_TIME,
+  DEFAULT_OVERTIME,
   DEFAULT_MODE,
   MODES,
 };

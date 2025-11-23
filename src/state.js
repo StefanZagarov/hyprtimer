@@ -1,11 +1,12 @@
 // Constants are available through window.electronAPI.constants
-const { TIMER_STATE, DEFAULT_TIME, MODES } = window.electronAPI.constants;
+const { TIMER_STATE, DEFAULT_TIME, DEFAULT_OVERTIME, MODES } =
+  window.electronAPI.constants;
 
 const initialState = {
   state: TIMER_STATE.IDLE,
   timeSet: DEFAULT_TIME,
   displayTime: DEFAULT_TIME,
-  mode: "instant",
+  displayOvertime: DEFAULT_OVERTIME,
   title: "Not set",
   ui: {
     startButton: { enabled: false, visible: true },
@@ -17,10 +18,10 @@ const initialState = {
   settings: {
     isOpen: false,
     volume: 0.5,
-    vibration: false, // Future TODO: add vibration for mobile login in the time up logic
+    vibration: true,
     showTitle: true,
-    showEndTimer: true, // Counter after timer ends
-    mode: "instant", // Move mode here
+    showOvertime: true,
+    mode: "instant", // TODO: Check for logic still looking for mode outside of the settings property
   },
 };
 
@@ -35,13 +36,14 @@ function subscribe(listener) {
   listeners.push(listener);
   return () => {
     const index = listeners.indexOf(listener);
-    // ? - what does this check, why does it splice the listeners?
+    // Question - what does this check, why does it splice the listeners?
     if (index > -1) listeners.splice(index, 1);
   };
 }
 
 function updateState(partialState) {
   currentState = { ...currentState, ...partialState };
+  // Question - what is the purpose of this?
   listeners.forEach((fn) => fn(currentState));
 }
 
@@ -83,8 +85,9 @@ function loadSettings(settings) {
 }
 
 function setVolume(volume) {
-  const validateVolume = Math.max(0, Math.min(1, volume));
-  updateSetting("volume", validateVolume);
+  const validatedVolume = Math.max(0, Math.min(1, volume));
+  updateSetting("volume", validatedVolume);
+  window.audio.setVolume(validatedVolume);
 }
 
 function setTime(time) {
@@ -104,6 +107,10 @@ function setTime(time) {
 
 function updateDisplayTime(time) {
   updateState({ displayTime: time });
+}
+
+function updateDisplayOvertime(time) {
+  updateState({ displayOvertime: time });
 }
 
 function startTimer() {
@@ -143,7 +150,7 @@ function pauseTimer() {
 function finishTimer() {
   updateState({
     state: TIMER_STATE.FINISHED,
-    title: "Time since stopped: 00:00:00", // will be updated externally
+    title: "Finished",
     ui: {
       startButton: { enabled: false, visible: true },
       stopButton: { enabled: false, visible: false },
@@ -158,6 +165,7 @@ function resetFromFinished() {
   updateState({
     state: TIMER_STATE.IDLE,
     displayTime: currentState.timeSet,
+    displayOvertime: DEFAULT_OVERTIME,
     title: "Timer set",
     ui: {
       startButton: { enabled: true, visible: true },
@@ -200,12 +208,8 @@ function clearTimer() {
 
 function setMode(mode) {
   MODES.includes(mode)
-    ? updateState({ mode })
+    ? updateSetting("mode", mode)
     : console.error(`Invalid mode selected`);
-}
-
-function updateTitle(title) {
-  updateState({ title });
 }
 
 // Export public API to global scope for browser usage
@@ -218,11 +222,11 @@ window.state = {
   loadSettings,
   setTime,
   updateDisplayTime,
+  updateDisplayOvertime,
   startTimer,
   pauseTimer,
   finishTimer,
   resetFromFinished,
   clearTimer,
   setMode,
-  updateTitle,
 };

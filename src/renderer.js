@@ -2,9 +2,8 @@
 document.addEventListener("DOMContentLoaded", async () => {
   try {
     // Load persisted data using electronAPI
-    const [time, mode, settings] = await Promise.all([
+    const [time, settings] = await Promise.all([
       await window.electronAPI.storage.loadTime(),
-      await window.electronAPI.storage.loadMode(),
       await window.electronAPI.storage.loadSettings(),
     ]);
 
@@ -14,7 +13,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Initialize state (available as window.state after state.js loads)
     window.state.setTime(time);
-    window.state.setMode(mode);
+    // window.state.setMode(mode);
     window.state.loadSettings(settings);
 
     // Start the UI (available as window.ui after ui.js loads)

@@ -16,190 +16,63 @@
   </head>
 
   <body>
-    <h1 id="title">Not set</h1>
-    <div id="display-container">
-      <div id="timer">00:00:00</div>
-      <div id="buttons">
-        <button id="start" class="disabled">Start</button>
-        <button id="stop">Stop</button>
-        <button id="clear" class="disabled">Clear</button>
-      </div>
-    </div>
-
-    <div id="timerForm">
-      <form action="">
-        <div id="inputs">
-          <input type="number" name="hours" />
-          <label for="minutes">:</label>
-          <input type="number" name="minutes" />
-          <label for="seconds">:</label>
-          <input type="number" name="seconds" />
-        </div>
-        <button type="button" id="setTimer">Set Timer</button>
-      </form>
-    </div>
-
-    <div id="settings">
-      <div id="settings-icon">
-        <div id="cog" aria-label="Open settings">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-            <rect width="256" height="256" fill="none" />
-            <circle
-              cx="128"
-              cy="128"
-              r="40"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="16"
-            />
-            <path
-              d="M130.05,206.11c-1.34,0-2.69,0-4,0L94,224a104.61,104.61,0,0,1-34.11-19.2l-.12-36c-.71-1.12-1.38-2.25-2-3.41L25.9,147.24a99.15,99.15,0,0,1,0-38.46l31.84-18.1c.65-1.15,1.32-2.29,2-3.41l.16-36A104.58,104.58,0,0,1,94,32l32,17.89c1.34,0,2.69,0,4,0L162,32a104.61,104.61,0,0,1,34.11,19.2l.12,36c.71,1.12,1.38,2.25,2,3.41l31.85,18.14a99.15,99.15,0,0,1,0,38.46l-31.84,18.1c-.65,1.15-1.32,2.29-2,3.41l-.16,36A104.58,104.58,0,0,1,162,224Z"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="16"
-            />
-          </svg>
-        </div>
-
-        <div id="chevron">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-            <rect width="256" height="256" fill="none" />
-            <polyline
-              points="96 48 176 128 96 208"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="16"
-            />
-          </svg>
+    <div id="container">
+      <h1 id="title">Not set</h1>
+      <div id="display-container">
+        <div id="timer">00:00:00</div>
+        <div id="buttons">
+          <button id="start" class="disabled">Start</button>
+          <button id="stop">Stop</button>
+          <button id="clear" class="disabled">Clear</button>
         </div>
       </div>
 
-      <div id="settings-panel" aria-hidden="true">
-        <div class="setting">
-          <label for="vibration-toggle" id="toggle-label" class="capsule">
-            <div class="toggle-container">
-              <input
-                type="checkbox"
-                id="vibration-toggle"
-                class="toggle-input"
-              />
-              <div class="toggle-slider"></div>
-            </div>
-          </label>
-
-          <div class="settings-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-              <rect width="256" height="256" fill="none" />
-              <rect
-                x="40"
-                y="80"
-                width="176"
-                height="96"
-                rx="16"
-                transform="translate(256) rotate(90)"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="16"
-              />
-              <line
-                x1="208"
-                y1="88"
-                x2="208"
-                y2="168"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="16"
-              />
-              <line
-                x1="240"
-                y1="104"
-                x2="240"
-                y2="152"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="16"
-              />
-              <line
-                x1="48"
-                y1="88"
-                x2="48"
-                y2="168"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="16"
-              />
-              <line
-                x1="16"
-                y1="104"
-                x2="16"
-                y2="152"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="16"
-              />
-            </svg>
+      <div id="timerForm">
+        <form action="">
+          <div id="inputs">
+            <input type="number" name="hours" />
+            <label for="minutes">:</label>
+            <input type="number" name="minutes" />
+            <label for="seconds">:</label>
+            <input type="number" name="seconds" />
           </div>
-        </div>
+          <button type="button" id="setTimer">Set Timer</button>
+        </form>
+      </div>
 
-        <div class="setting">
-          <label for="volume-slider">
-            <div class="slider-container">
-              <span class="volume-value">100%</span>
-              <input
-                type="range"
-                id="volume-slider"
-                min="0"
-                max="1"
-                step="0.01"
-                value="1.0"
-                aria-label="Volume control"
-              />
-            </div>
-          </label>
+      <p id="overtime">00:00:00</p>
 
-          <div class="settings-icon">
+      <div id="settings">
+        <div id="settings-icon">
+          <div id="cog" aria-label="Open settings">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
               <rect width="256" height="256" fill="none" />
+              <circle
+                cx="128"
+                cy="128"
+                r="40"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="16"
+              />
               <path
-                d="M88,168H40a8,8,0,0,1-8-8V96a8,8,0,0,1,8-8H88l72-56V224Z"
+                d="M130.05,206.11c-1.34,0-2.69,0-4,0L94,224a104.61,104.61,0,0,1-34.11-19.2l-.12-36c-.71-1.12-1.38-2.25-2-3.41L25.9,147.24a99.15,99.15,0,0,1,0-38.46l31.84-18.1c.65-1.15,1.32-2.29,2-3.41l.16-36A104.58,104.58,0,0,1,94,32l32,17.89c1.34,0,2.69,0,4,0L162,32a104.61,104.61,0,0,1,34.11,19.2l.12,36c.71,1.12,1.38,2.25,2,3.41l31.85,18.14a99.15,99.15,0,0,1,0,38.46l-31.84,18.1c-.65,1.15-1.32,2.29-2,3.41l-.16,36A104.58,104.58,0,0,1,162,224Z"
                 fill="none"
                 stroke="currentColor"
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="16"
               />
-              <line
-                x1="200"
-                y1="104"
-                x2="200"
-                y2="152"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="16"
-              />
-              <line
-                x1="232"
-                y1="88"
-                x2="232"
-                y2="168"
+            </svg>
+          </div>
+
+          <div id="chevron">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+              <rect width="256" height="256" fill="none" />
+              <polyline
+                points="96 48 176 128 96 208"
                 fill="none"
                 stroke="currentColor"
                 stroke-linecap="round"
@@ -210,27 +83,254 @@
           </div>
         </div>
 
-        <div class="setting">
-          <div class="timer-modes-pill" role="radiogroup">
-            <div id="highlight"></div>
+        <div id="settings-panel" aria-hidden="true">
+          <div class="setting">
+            <label for="title-toggle" id="toggle-label" class="capsule">
+              <div class="toggle-container">
+                <input type="checkbox" id="title-toggle" class="toggle-input" />
+                <div class="toggle-slider"></div>
+              </div>
+            </label>
 
-            <button
-              class="toggle-option"
-              type="button"
-              data-mode="instant"
-              aria-pressed="true"
-            >
-              Instant
-            </button>
+            <div class="settings-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                <rect width="256" height="256" fill="none" />
+                <line
+                  x1="128"
+                  y1="56"
+                  x2="128"
+                  y2="200"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="16"
+                />
+                <polyline
+                  points="56 88 56 56 200 56 200 88"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="16"
+                />
+                <line
+                  x1="96"
+                  y1="200"
+                  x2="160"
+                  y2="200"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="16"
+                />
+              </svg>
+            </div>
+          </div>
 
-            <button
-              class="toggle-option active"
-              type="button"
-              data-mode="clock"
-              aria-pressed="true"
-            >
-              Clock
-            </button>
+          <div class="setting">
+            <label for="overtime-toggle" id="toggle-label" class="capsule">
+              <div class="toggle-container">
+                <input
+                  type="checkbox"
+                  id="overtime-toggle"
+                  class="toggle-input"
+                />
+                <div class="toggle-slider"></div>
+              </div>
+            </label>
+
+            <div class="settings-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                <rect width="256" height="256" fill="none" />
+                <circle
+                  cx="128"
+                  cy="136"
+                  r="88"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="16"
+                />
+                <line
+                  x1="128"
+                  y1="136"
+                  x2="168"
+                  y2="96"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="16"
+                />
+                <line
+                  x1="104"
+                  y1="16"
+                  x2="152"
+                  y2="16"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="16"
+                />
+              </svg>
+            </div>
+          </div>
+
+          <div class="setting" id="vibration-setting">
+            <label for="vibration-toggle" id="toggle-label" class="capsule">
+              <div class="toggle-container">
+                <input
+                  type="checkbox"
+                  id="vibration-toggle"
+                  class="toggle-input"
+                />
+                <div class="toggle-slider"></div>
+              </div>
+            </label>
+
+            <div class="settings-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                <rect width="256" height="256" fill="none" />
+                <rect
+                  x="40"
+                  y="80"
+                  width="176"
+                  height="96"
+                  rx="16"
+                  transform="translate(256) rotate(90)"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="16"
+                />
+                <line
+                  x1="208"
+                  y1="88"
+                  x2="208"
+                  y2="168"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="16"
+                />
+                <line
+                  x1="240"
+                  y1="104"
+                  x2="240"
+                  y2="152"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="16"
+                />
+                <line
+                  x1="48"
+                  y1="88"
+                  x2="48"
+                  y2="168"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="16"
+                />
+                <line
+                  x1="16"
+                  y1="104"
+                  x2="16"
+                  y2="152"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="16"
+                />
+              </svg>
+            </div>
+          </div>
+
+          <div class="setting">
+            <label for="volume-slider">
+              <div class="slider-container">
+                <span class="volume-value">100%</span>
+                <input
+                  type="range"
+                  id="volume-slider"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value="1.0"
+                  aria-label="Volume control"
+                />
+              </div>
+            </label>
+
+            <div class="settings-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                <rect width="256" height="256" fill="none" />
+                <path
+                  d="M88,168H40a8,8,0,0,1-8-8V96a8,8,0,0,1,8-8H88l72-56V224Z"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="16"
+                />
+                <line
+                  x1="200"
+                  y1="104"
+                  x2="200"
+                  y2="152"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="16"
+                />
+                <line
+                  x1="232"
+                  y1="88"
+                  x2="232"
+                  y2="168"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="16"
+                />
+              </svg>
+            </div>
+          </div>
+
+          <div class="setting">
+            <div class="timer-modes-pill" role="radiogroup">
+              <div id="highlight"></div>
+
+              <button
+                class="toggle-option"
+                type="button"
+                data-mode="instant"
+                aria-pressed="true"
+              >
+                Instant
+              </button>
+
+              <button
+                class="toggle-option active"
+                type="button"
+                data-mode="clock"
+                aria-pressed="true"
+              >
+                Clock
+              </button>
+            </div>
           </div>
         </div>
       </div>

@@ -1,13 +1,13 @@
 // Access state and functions through global objects and electronAPI
 // state will be available as window.state after state.js loads
 // countDown will be available as window.timer.countDown after timer.js loads
-// saveTime and saveMode are available through window.electronAPI.storage
 
 // --- DOM Elements ---
 const displayContainer = document.getElementById("display-container");
 const timerFormContainer = document.getElementById("timerForm");
 const form = document.querySelector("form");
 const timerDisplay = document.getElementById("timer");
+const overtimeDisplay = document.getElementById("overtime");
 const startButton = document.getElementById("start");
 const stopButton = document.getElementById("stop");
 const clearButton = document.getElementById("clear");
@@ -18,6 +18,8 @@ const titleEl = document.getElementById("title");
 const settingsIcon = document.getElementById("settings-icon");
 const vibrationToggle = document.getElementById("vibration-toggle");
 const volumeSlider = document.getElementById("volume-slider");
+const titleToggle = document.getElementById("title-toggle");
+const overtimeToggle = document.getElementById("overtime-toggle");
 
 // --- Timer cleanup reference ---
 let cancelCountdown = null;
@@ -26,11 +28,17 @@ function setupUI() {
   render(window.state.getState());
   window.state.subscribe(render);
   setupEventListeners();
+
+  if (!isVibrationSupported()) {
+    document.getElementById("vibration-setting").style.display = "none";
+  }
 }
 
 function render(currentState) {
-  timerDisplay.textContent = currentState.displayTime;
   titleEl.textContent = currentState.title;
+  timerDisplay.textContent = currentState.displayTime;
+  overtimeDisplay.textContent = currentState.displayOvertime;
+  showOvertime(currentState);
 
   syncButton(startButton, currentState.ui.startButton);
   syncButton(stopButton, currentState.ui.stopButton);
@@ -49,7 +57,7 @@ function render(currentState) {
 
   // Update active class on mode buttons
   timerModeBtns.forEach((btn) => {
-    const isActive = btn.dataset.mode === currentState.mode;
+    const isActive = btn.dataset.mode === currentState.settings.mode;
     btn.classList.toggle("active", isActive);
     btn.setAttribute("aria-pressed", isActive.toString());
     updateHighlightPosition();
@@ -63,21 +71,50 @@ function render(currentState) {
 
   // Settings UI elements linkage to the state
   vibrationToggle.checked = currentState.settings.vibration;
+  titleToggle.checked = currentState.settings.showTitle;
+  displayTitle(currentState);
+  overtimeToggle.checked = currentState.settings.showOvertime;
 
   // Volume slider
   volumeSlider.value = currentState.settings.volume;
   updateVolumeDisplay(currentState.settings.volume);
 }
 
+// Settings reading
 function updateVolumeDisplay(volume) {
   const volumeValue = document.querySelector(".volume-value");
   volumeValue.textContent = `${Math.round(volume * 100)}%`;
+}
+function displayTitle(currentState) {
+  titleEl.style.visibility = currentState.settings.showTitle
+    ? "visible"
+    : "hidden";
+}
+function showOvertime(currentState) {
+  if (
+    currentState.state === "finished" &&
+    currentState.settings.showOvertime === true
+  ) {
+    overtimeDisplay.style.visibility = "visible";
+  } else {
+    overtimeDisplay.style.visibility = "hidden";
+  }
+}
+function isVibrationSupported() {
+  const hasAPI = typeof navigator.vibrate === "function";
+
+  const isMobile =
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent,
+    );
+
+  return hasAPI && isMobile;
 }
 
 function updateHighlightPosition(initial = false) {
   const currentState = window.state.getState();
   const activeBtn = Array.from(timerModeBtns).find(
-    (btn) => btn.dataset.mode === currentState.mode,
+    (btn) => btn.dataset.mode === currentState.settings.mode,
   );
 
   if (activeBtn && initial) {
@@ -112,26 +149,32 @@ function setupEventListeners() {
   startButton.addEventListener("click", handleStartClick);
   stopButton.addEventListener("click", handleStopClick);
 
+  // Settings
   timerModeBtns.forEach((btn) => {
     btn.addEventListener("click", (e) => {
       const mode = e.currentTarget.dataset.mode;
       if (mode !== window.state.getState().mode) {
         window.state.setMode(mode);
-        window.electronAPI.storage.saveMode(mode);
       }
     });
   });
 
   settingsIcon.addEventListener("click", handleToggleSettingsPanel);
   //TODO: Make an object which will be used to make sure we send the proper setting names (type safety)
+  //TODO: The clock mode does not update on initializing, only on Start click
   vibrationToggle.addEventListener("change", (e) => {
     handleToggleSetting("vibration", e);
+  });
+  titleToggle.addEventListener("change", (e) => {
+    handleToggleSetting("showTitle", e);
+  });
+  overtimeToggle.addEventListener("change", (e) => {
+    handleToggleSetting("showOvertime", e);
   });
 
   volumeSlider.addEventListener("input", (e) => {
     const volume = parseFloat(e.target.value);
     window.state.setVolume(volume);
-    window.audio.setVolume(volume);
     updateVolumeDisplay(volume);
   });
 }
@@ -164,6 +207,8 @@ function handleStopClick() {
   // Update state to paused
   window.state.pauseTimer();
 }
+
+function handleOvertime() {}
 
 // Settings handling
 function handleToggleSettingsPanel() {
@@ -230,6 +275,4 @@ function handleClearClick() {
 
 window.ui = {
   setupUI,
-  updateDisplayTime: window.state.updateDisplayTime,
-  updateTitle: window.state.updateTitle,
 };
