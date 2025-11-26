@@ -1,5 +1,4 @@
-// Constants are available through window.electronAPI.constants
-const { TIMER_STATE, DEFAULT_TIME, DEFAULT_OVERTIME, MODES } =
+const { TIMER_STATE, SETTINGS_KEYS, DEFAULT_TIME, DEFAULT_OVERTIME, MODES } =
   window.electronAPI.constants;
 
 const initialState = {
@@ -21,7 +20,7 @@ const initialState = {
     vibration: true,
     showTitle: true,
     showOvertime: true,
-    mode: "instant", // TODO: Check for logic still looking for mode outside of the settings property
+    mode: "instant",
   },
 };
 
@@ -56,6 +55,13 @@ function toggleSettingsPanel() {
 }
 
 function updateSetting(key, value, loadedFromStorage = false) {
+  const allowedKeys = Object.values(SETTINGS_KEYS);
+
+  if (!allowedKeys.includes(key)) {
+    console.error(`State Error: ${key} is not a valid setting.`);
+    return;
+  }
+
   updateState({
     settings: {
       ...currentState.settings,
@@ -84,7 +90,7 @@ function loadSettings(settings) {
 
 function setVolume(volume) {
   const validatedVolume = Math.max(0, Math.min(1, volume));
-  updateSetting("volume", validatedVolume);
+  updateSetting(SETTINGS_KEYS.VOLUME, validatedVolume);
   window.audio.setVolume(validatedVolume);
 }
 
@@ -206,7 +212,7 @@ function clearTimer() {
 
 function setMode(mode) {
   MODES.includes(mode)
-    ? updateSetting("mode", mode)
+    ? updateSetting(SETTINGS_KEYS.MODE, mode)
     : console.error(`Invalid mode selected`);
 }
 

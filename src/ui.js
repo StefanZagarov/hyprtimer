@@ -1,8 +1,3 @@
-// Access state and functions through global objects and electronAPI
-// state will be available as window.state after state.js loads
-// countDown will be available as window.timer.countDown after timer.js loads
-
-// --- DOM Elements ---
 const displayContainer = document.getElementById("display-container");
 const timerFormContainer = document.getElementById("timerForm");
 const form = document.querySelector("form");
@@ -21,7 +16,7 @@ const volumeSlider = document.getElementById("volume-slider");
 const titleToggle = document.getElementById("title-toggle");
 const overtimeToggle = document.getElementById("overtime-toggle");
 
-// --- Timer cleanup reference ---
+// Cleanup reference
 let cancelCountdown = null;
 
 function setupUI() {
@@ -55,7 +50,6 @@ function render(currentState) {
     ),
   );
 
-  // Update active class on mode buttons
   timerModeBtns.forEach((btn) => {
     const isActive = btn.dataset.mode === currentState.settings.mode;
     btn.classList.toggle("active", isActive);
@@ -63,7 +57,6 @@ function render(currentState) {
     updateHighlightPosition();
   });
 
-  // Toggle the settings' open class based on state
   ["chevron", "settings-panel"].forEach((id) => {
     const element = document.getElementById(id);
     element.classList.toggle("open", currentState.settings.isOpen);
@@ -75,14 +68,13 @@ function render(currentState) {
   displayTitle(currentState);
   overtimeToggle.checked = currentState.settings.showOvertime;
 
-  // Volume slider
   volumeSlider.value = currentState.settings.volume;
   updateVolumeDisplay(currentState.settings.volume);
 }
 
 // Settings reading
 function updateVolumeDisplay(volume) {
-  const volumeValue = document.querySelector(".volume-value");
+  const volumeValue = document.querySelector("#volume-value");
   volumeValue.textContent = `${Math.round(volume * 100)}%`;
 }
 function displayTitle(currentState) {
@@ -136,20 +128,53 @@ function syncButton(el, config) {
 }
 
 function setupEventListeners() {
+  const { SETTINGS_KEYS } = window.electronAPI.constants;
+
   timerDisplay.addEventListener("click", () => {
     if (window.state.getState().ui.timerClickable) openTimerForm();
   });
 
-  form.elements.hours.addEventListener("input", handleFormInput);
-  form.elements.minutes.addEventListener("input", handleFormInput);
-  form.elements.seconds.addEventListener("input", handleFormInput);
+  ["hours", "minutes", "seconds"].forEach((name) => {
+    const element = form.elements[name];
 
+    element.addEventListener("keydown", (e) => {
+      if (["e", "E", "+", "-"].includes(e.key)) {
+        e.preventDefault();
+      }
+    });
+
+    element.addEventListener("input", (e) => {
+      const field = e.target;
+
+      if (field.value.length > 2) {
+        field.value = field.value.slice(-2);
+      }
+
+      if (field.value.length === 1) {
+        field.value = "0" + field.value;
+      }
+
+      if (field.value.length === 0) {
+        field.value = "00";
+      }
+    });
+
+    element.addEventListener("blur", (e) => {
+      const target = e.target;
+      const name = e.target.name;
+
+      if (name === "hours") return;
+
+      if (target.value > "59") {
+        target.value = "59";
+      }
+    });
+  });
   setTimerButton.addEventListener("click", handleSetTimer);
   clearButton.addEventListener("click", handleClearClick);
   startButton.addEventListener("click", handleStartClick);
   stopButton.addEventListener("click", handleStopClick);
 
-  // Settings
   timerModeBtns.forEach((btn) => {
     btn.addEventListener("click", (e) => {
       const mode = e.currentTarget.dataset.mode;
@@ -160,16 +185,15 @@ function setupEventListeners() {
   });
 
   settingsIcon.addEventListener("click", handleToggleSettingsPanel);
-  //TODO: Make an object which will be used to make sure we send the proper setting names (type safety)
-  //TODO: The clock mode does not update on initializing, only on Start click
+
   vibrationToggle.addEventListener("change", (e) => {
-    handleToggleSetting("vibration", e);
+    handleToggleSetting(SETTINGS_KEYS.VIBRATION, e);
   });
   titleToggle.addEventListener("change", (e) => {
-    handleToggleSetting("showTitle", e);
+    handleToggleSetting(SETTINGS_KEYS.SHOW_TITLE, e);
   });
   overtimeToggle.addEventListener("change", (e) => {
-    handleToggleSetting("showOvertime", e);
+    handleToggleSetting(SETTINGS_KEYS.SHOW_OVERTIME, e);
   });
 
   volumeSlider.addEventListener("input", (e) => {
@@ -183,7 +207,6 @@ function handleStartClick() {
   const { displayTime } = window.state.getState();
   if (displayTime === "00:00:00") return;
 
-  // Cancel any existing countdown (defensive)
   if (cancelCountdown) cancelCountdown();
 
   // Compute end time
@@ -191,7 +214,6 @@ function handleStartClick() {
   const totalMs = (h * 3600 + m * 60 + s) * 1000;
   const endTime = Date.now() + totalMs;
 
-  // Start the state machine
   window.state.startTimer();
 
   // Launch the actual countdown
@@ -199,18 +221,14 @@ function handleStartClick() {
 }
 
 function handleStopClick() {
-  // Cancel the running timer
   if (cancelCountdown) {
     cancelCountdown();
     cancelCountdown = null;
   }
-  // Update state to paused
+
   window.state.pauseTimer();
 }
 
-function handleOvertime() {}
-
-// Settings handling
 function handleToggleSettingsPanel() {
   window.state.toggleSettingsPanel();
   updateHighlightPosition(true);
@@ -231,25 +249,6 @@ function openTimerForm() {
   form.elements.seconds.value = s;
 }
 
-// TODO: Make sure inputting letters is prohibited
-// TODO: Maybe let maxed out fields (59) to change the 9 to the new number
-function handleFormInput(e) {
-  const field = e.target;
-  const name = field.name;
-
-  if (field.value.length > 2) {
-    field.value = field.value.slice(-2);
-  }
-
-  if ((name === "minutes" || name === "seconds") && Number(field.value) > 59) {
-    field.value = "59";
-  }
-
-  if (field.value.length === 1) {
-    field.value = "0" + field.value;
-  }
-}
-
 function handleSetTimer() {
   const timeString = `${form.elements.hours.value}:${form.elements.minutes.value}:${form.elements.seconds.value}`;
   timerFormContainer.style.display = "none";
@@ -259,7 +258,6 @@ function handleSetTimer() {
 }
 
 function handleClearClick() {
-  // Cancel any active countdown
   if (cancelCountdown) {
     cancelCountdown();
     cancelCountdown = null;

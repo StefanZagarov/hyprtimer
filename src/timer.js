@@ -1,5 +1,3 @@
-// state is available as window.state
-
 /**
  * Starts a countdown timer that updates based on real wall-clock time.
  * Preserves your original timing logic for "clock" and "instant" modes.
@@ -57,7 +55,6 @@ function countDown(endTime) {
   };
 
   const finishTimer = () => {
-    // Clear timeout
     if (timerId) {
       clearTimeout(timerId);
       timerId = null;
@@ -66,23 +63,20 @@ function countDown(endTime) {
     // Unregister from Electron resume
     window.electronAPI.removeResume(tick);
 
-    // Transition state
     window.state.finishTimer();
 
     if (navigator.vibrate && window.state.getState().settings.vibration) {
       navigator.vibrate(200);
     }
-    // Play sound
+
     window.audio.playTimeUpSound();
 
     // Start "overtime" counter
     overtimeCount();
   };
 
-  // Start ticking
   tick();
 
-  // Register for system resume (e.g., after sleep)
   window.electronAPI.onResume(tick);
 
   // Return cleanup function
@@ -103,7 +97,6 @@ function overtimeCount() {
   let _timerId = null;
 
   const tick = () => {
-    // Stop if no longer in FINISHED state
     if (window.state.getState().state !== "finished") return;
 
     const elapsedMs = Date.now() - startTime;
@@ -123,7 +116,6 @@ function overtimeCount() {
   window.electronAPI.onResume(tick);
 }
 
-// Export to global scope
 window.timer = {
   countDown,
 };

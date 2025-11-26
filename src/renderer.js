@@ -13,7 +13,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Initialize state (available as window.state after state.js loads)
     window.state.setTime(time);
-    // window.state.setMode(mode);
     window.state.loadSettings(settings);
 
     // Start the UI (available as window.ui after ui.js loads)

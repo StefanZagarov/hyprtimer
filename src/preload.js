@@ -4,6 +4,7 @@
 const { contextBridge, ipcRenderer } = require("electron");
 const {
   TIMER_STATE,
+  SETTINGS_KEYS,
   DEFAULT_TIME,
   DEFAULT_MODE,
   MODES,
@@ -31,20 +32,15 @@ async function saveTime(time) {
 async function saveSetting(key, value) {
   try {
     // Validate settings keys to prevent injection attacks
-    const validKeys = [
-      "volume",
-      "vibration",
-      "showTitle",
-      "showOvertime",
-      "mode",
-    ];
+    const validKeys = Object.values(SETTINGS_KEYS);
+
     if (!validKeys.includes(key)) {
       throw new Error("Invalid settings key:", key);
     }
 
     // Validate volume value
     if (
-      key === "volume" &&
+      key === SETTINGS_KEYS.VOLUME &&
       (typeof value !== "number" || value < 0 || value > 1)
     ) {
       throw new Error("Invalid volume value:", value);
@@ -61,11 +57,31 @@ async function loadSettings() {
     // Load each setting with fallback
     const [volume, vibration, showTitle, showOvertime, mode] =
       await Promise.all([
-        ipcRenderer.invoke("store-get", "settings.volume", 0.5),
-        ipcRenderer.invoke("store-get", "settings.vibration", true),
-        ipcRenderer.invoke("store-get", "settings.showTitle", true),
-        ipcRenderer.invoke("store-get", "settings.showOvertime", true),
-        ipcRenderer.invoke("store-get", "settings.mode", "instant"),
+        ipcRenderer.invoke(
+          "store-get",
+          `settings.${SETTINGS_KEYS.VOLUME}`,
+          0.5,
+        ),
+        ipcRenderer.invoke(
+          "store-get",
+          `settings.${SETTINGS_KEYS.VIBRATION}`,
+          true,
+        ),
+        ipcRenderer.invoke(
+          "store-get",
+          `settings.${SETTINGS_KEYS.SHOW_TITLE}`,
+          true,
+        ),
+        ipcRenderer.invoke(
+          "store-get",
+          `settings.${SETTINGS_KEYS.SHOW_OVERTIME}`,
+          true,
+        ),
+        ipcRenderer.invoke(
+          "store-get",
+          `settings.${SETTINGS_KEYS.MODE}`,
+          "instant",
+        ),
       ]);
 
     return { volume, vibration, showTitle, showOvertime, mode };
@@ -101,6 +117,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 
   constants: {
     TIMER_STATE,
+    SETTINGS_KEYS,
     DEFAULT_TIME,
     DEFAULT_OVERTIME,
     DEFAULT_MODE,
