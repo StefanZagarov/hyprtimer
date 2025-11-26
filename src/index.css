@@ -105,8 +105,6 @@ input,
   font-size: inherit;
   color: inherit;
 
-  bottom: -0.006rem;
-
   display: inline-block;
   line-height: 1;
 
@@ -400,7 +398,6 @@ input[type="number"]::-webkit-outer-spin-button {
   #timerForm input,
   .colon {
     font-size: inherit;
-    bottom: -0.005rem;
   }
 
   #title {
@@ -434,13 +431,3 @@ input[type="number"]::-webkit-outer-spin-button {
   }
 }
 
-@media (max-width: 380px) {
-  #timer,
-  #timerForm #inputs {
-    font-size: 2.5rem;
-  }
-  #buttons {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-}
