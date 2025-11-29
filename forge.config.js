@@ -6,7 +6,7 @@ module.exports = {
     asar: true,
     asarUnpack: ["node_modules/electron-store/**"],
     extraResources: ["./src/assets"],
-    icon: ".src/assets/icons/icon",
+    icon: "./src/assets/icons/icon",
   },
   rebuildConfig: {},
   makers: [
