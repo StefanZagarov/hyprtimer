@@ -3,7 +3,7 @@ name: Build and Release
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 permissions:
   contents: write
@@ -46,5 +46,6 @@ jobs:
             out/make/zip/darwin/x64/*.zip
             out/make/deb/x64/*.deb
             out/make/rpm/x64/*.rpm
+            out/make/zip/linux/x64/*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
