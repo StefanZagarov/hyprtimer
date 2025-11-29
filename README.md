@@ -24,12 +24,59 @@ A precise, cross-platform countdown timer built with Electron. Clean interface, 
 
 ### Installation
 
-**Option 1: Download Release (Recommended)**
+Download the latest release for your platform from the [Releases](https://github.com/StefanZagarov/Hyprtimer/releases) page.
+
+#### Linux
+
+**Debian/Ubuntu (.deb)**
 ```bash
-# Coming soon - pre-built binaries will be available in Releases
+# Download the .deb file from releases, then install:
+sudo dpkg -i hyprtimer_*.deb
+
+# If there are dependency issues:
+sudo apt-get install -f
+
+# Launch from applications menu or run:
+hyprtimer
 ```
 
-**Option 2: Build from Source**
+**Fedora/RHEL (.rpm)**
+```bash
+# Download the .rpm file from releases, then install:
+sudo rpm -i hyprtimer-*.rpm
+
+# Or using dnf:
+sudo dnf install ./hyprtimer-*.rpm
+
+# Launch from applications menu or run:
+hyprtimer
+```
+
+**Arch Linux / Other distros (.zip - portable)**
+```bash
+# Download the .zip file from releases, then extract and run:
+unzip hyprtimer-linux-x64-*.zip
+cd hyprtimer-linux-x64
+./hyprtimer
+
+# Optional: Create a desktop entry or symlink to /usr/local/bin for system-wide access
+```
+
+#### Windows
+
+1. Download the `.exe` installer from releases
+2. Run the installer (it will install Hyprtimer to your system)
+3. Launch Hyprtimer from the Start menu or Desktop shortcut
+
+#### macOS
+
+1. Download the `.zip` file from releases
+2. Extract the archive
+3. Move `Hyprtimer.app` to your Applications folder
+4. Launch Hyprtimer from Applications or Launchpad
+
+#### Build from Source
+
 ```bash
 # Clone the repository
 git clone https://github.com/StefanZagarov/Hyprtimer.git
@@ -38,8 +85,11 @@ cd Hyprtimer
 # Install dependencies
 npm install
 
-# Run the application
+# Run in development mode
 npm start
+
+# Or build for your platform
+npm run make
 ```
 
 ## Usage
@@ -91,10 +141,12 @@ npm run package
 npm run make
 ```
 
-Electron Forge will create platform-specific installers in the `out/` directory:
+Electron Forge will create platform-specific installers in the `out/make/` directory:
 - **Linux**: `.deb`, `.rpm`, `.zip`
-- **Windows**: `.exe`, `.zip` (when built on Windows)
-- **macOS**: `.dmg`, `.zip` (when built on macOS)
+- **Windows**: `.exe` (Squirrel installer)
+- **macOS**: `.zip`
+
+Releases are automatically built for all platforms when you push a version tag (e.g., `v1.0.0`).
 
 ## Tech Stack
 
@@ -106,7 +158,12 @@ Electron Forge will create platform-specific installers in the `out/` directory:
 ## Platform Support
 
 - **Linux** (tested on Arch Linux/Hyprland)
-- **Windows** (planned)
-- **macOS** (planned)
+  - Debian/Ubuntu (`.deb`)
+  - Fedora/RHEL (`.rpm`)
+  - Portable (`.zip`)
+- **Windows** 
+  - Installer (`.exe`)
+- **macOS**
+  - Portable (`.zip`)
 
 The application is built with Electron to ensure cross-platform compatibility.
