@@ -54,12 +54,34 @@ hyprtimer
 
 **Arch Linux / Other distros (.zip - portable)**
 ```bash
-# Download the .zip file from releases, then extract and run:
+# Download the .zip file from releases, then extract:
 unzip hyprtimer-linux-x64-*.zip
-cd hyprtimer-linux-x64
-./hyprtimer
 
-# Optional: Create a desktop entry or symlink to /usr/local/bin for system-wide access
+# Move to your preferred location (example using ~/.local/share):
+mkdir -p ~/.local/share/hyprtimer
+mv hyprtimer-linux-x64/* ~/.local/share/hyprtimer/
+
+# Download and install the icon:
+mkdir -p ~/.local/share/icons
+curl -L https://raw.githubusercontent.com/StefanZagarov/Hyprtimer/main/src/assets/icons/icon.png \
+  -o ~/.local/share/icons/hyprtimer.png
+
+# Create a desktop entry for application launchers (rofi, dmenu, etc.):
+cat > ~/.local/share/applications/hyprtimer.desktop << EOF
+[Desktop Entry]
+Name=Hyprtimer
+Comment=Precise countdown timer
+Exec=$HOME/.local/share/hyprtimer/hyprtimer
+Icon=hyprtimer
+Terminal=false
+Type=Application
+Categories=Utility;
+EOF
+
+# Update desktop database:
+update-desktop-database ~/.local/share/applications/
+
+# Now you can launch with rofi by typing "Hyprtimer"
 ```
 
 #### Windows
@@ -158,12 +180,14 @@ Releases are automatically built for all platforms when you push a version tag (
 ## Platform Support
 
 - **Linux** (tested on Arch Linux/Hyprland)
-  - Debian/Ubuntu (`.deb`)
-  - Fedora/RHEL (`.rpm`)
-  - Portable (`.zip`)
+  - Debian/Ubuntu (`.deb`) - Auto-installs desktop entry
+  - Fedora/RHEL (`.rpm`) - Auto-installs desktop entry
+  - Portable (`.zip`) - Manual desktop entry setup required
 - **Windows** 
-  - Installer (`.exe`)
+  - Installer (`.exe`) - Auto-creates Start Menu shortcuts
 - **macOS**
-  - Portable (`.zip`)
+  - Portable (`.zip`) - Drag to Applications folder
 
-The application is built with Electron to ensure cross-platform compatibility.
+The application is built with Electron to ensure cross-platform compatibility. 
+
+**Note:** `.deb` and `.rpm` packages automatically install desktop entries for application launchers (rofi, dmenu, application menus). Portable `.zip` users need to follow the manual setup instructions above.
