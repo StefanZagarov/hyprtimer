@@ -20,11 +20,21 @@ module.exports = {
     },
     {
       name: "@electron-forge/maker-deb",
-      config: {},
+      config: {
+        options: {
+          categories: ["Utility"],
+          icon: "./src/assets/icons/icon.png",
+        },
+      },
     },
     {
       name: "@electron-forge/maker-rpm",
-      config: {},
+      config: {
+        options: {
+          categories: ["Utility"],
+          icon: "./src/assets/icons/icon.png",
+        },
+      },
     },
   ],
   plugins: [

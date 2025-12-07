@@ -24,8 +24,13 @@ const createWindow = () => {
   // and load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, "index.html"));
 
-  // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  // Development mode only: Open DevTools and show menu
+  if (!app.isPackaged) {
+    mainWindow.webContents.openDevTools();
+  } else {
+    // Production mode: Remove menu bar for a cleaner look
+    mainWindow.setMenu(null);
+  }
 };
 
 // This method will be called when Electron has finished
