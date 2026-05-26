@@ -24,6 +24,9 @@ function setupKeybindings() {
 }
 
 function toggleStartStop() {
+  const displayContainer = document.getElementById("display-container");
+  if (displayContainer.style.display === "none") return;
+
   const { ui } = window.state.getState();
   if (ui.startButton.visible && ui.startButton.enabled) {
     document.getElementById("start").click();
@@ -33,12 +36,18 @@ function toggleStartStop() {
 }
 
 function resetTimer() {
+  const displayContainer = document.getElementById("display-container");
+  if (displayContainer.style.display === "none") return;
+
   const { ui } = window.state.getState();
   if (ui.resetButton.visible && ui.resetButton.enabled) {
     document.getElementById("reset").click();
   }
 }
 function clearTimer() {
+  const displayContainer = document.getElementById("display-container");
+  if (displayContainer.style.display === "none") return;
+
   const { ui } = window.state.getState();
   if (ui.clearButton.visible && ui.clearButton.enabled) {
     document.getElementById("clear").click();
