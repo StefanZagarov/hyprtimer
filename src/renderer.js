@@ -7,6 +7,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       await window.electronAPI.storage.loadSettings(),
     ]);
 
+    // Remove focus from all elements - prevents buttons from being selected on widnow focus, or tab button
+    document.querySelectorAll('button, [role="button"]').forEach((el) => {
+      el.tabIndex = -1;
+    });
+
     if (window.audio) {
       window.audio.initAudio({ settings });
     }
@@ -17,6 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Start the UI (available as window.ui after ui.js loads)
     window.ui.setupUI();
+    window.keybindings.setupKeybindings();
   } catch (err) {
     console.error("Failed to initialize application:", err);
   }

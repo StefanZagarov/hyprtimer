@@ -6,6 +6,7 @@ const overtimeDisplay = document.getElementById("overtime");
 const startButton = document.getElementById("start");
 const stopButton = document.getElementById("stop");
 const clearButton = document.getElementById("clear");
+const resetButton = document.getElementById("reset");
 const setTimerButton = document.getElementById("setTimer");
 const timerModeBtns = document.querySelectorAll(".toggle-option");
 const highlight = document.getElementById("highlight");
@@ -38,6 +39,7 @@ function render(currentState) {
   syncButton(startButton, currentState.ui.startButton);
   syncButton(stopButton, currentState.ui.stopButton);
   syncButton(clearButton, currentState.ui.clearButton);
+  syncButton(resetButton, currentState.ui.resetButton);
 
   timerDisplay.classList.toggle(
     "disableTimerClick",
@@ -124,7 +126,6 @@ function syncButton(el, config) {
   el.disabled = !config.enabled;
   el.classList.toggle("disabled", !config.enabled);
   el.style.display = config.visible ? "flex" : "none";
-  if ("text" in config) el.textContent = config.text;
 }
 
 function setupEventListeners() {
@@ -171,9 +172,10 @@ function setupEventListeners() {
     });
   });
   setTimerButton.addEventListener("click", handleSetTimer);
-  clearButton.addEventListener("click", handleClearClick);
   startButton.addEventListener("click", handleStartClick);
   stopButton.addEventListener("click", handleStopClick);
+  clearButton.addEventListener("click", handleClearClick);
+  resetButton.addEventListener("click", handleResetClick);
 
   timerModeBtns.forEach((btn) => {
     btn.addEventListener("click", (e) => {
@@ -262,13 +264,15 @@ function handleClearClick() {
     cancelCountdown();
     cancelCountdown = null;
   }
+  window.state.clearTimer();
+}
 
-  const { state: currState } = window.state.getState();
-  if (currState === "finished") {
-    window.state.resetFromFinished();
-  } else {
-    window.state.clearTimer();
+function handleResetClick() {
+  if (cancelCountdown) {
+    cancelCountdown();
+    cancelCountdown = null;
   }
+  window.state.resetFromFinished();
 }
 
 window.ui = {

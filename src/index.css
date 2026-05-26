@@ -156,6 +156,15 @@ button {
   background-color: #e98282;
 }
 
+#reset {
+  color: #000000;
+  background-color: #e99595;
+  transition: background-color 0.2s ease-in-out;
+}
+#reset:hover {
+  background-color: #e98282;
+}
+
 .disabled {
   cursor: not-allowed;
   color: #000000 !important;

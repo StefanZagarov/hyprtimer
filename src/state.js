@@ -10,7 +10,8 @@ const initialState = {
   ui: {
     startButton: { enabled: false, visible: true },
     stopButton: { enabled: false, visible: false },
-    clearButton: { enabled: false, visible: true, text: "Clear" },
+    clearButton: { enabled: false, visible: true },
+    resetButton: { enabled: false, visible: false },
     timerClickable: true,
     modeButtonsClickable: true,
   },
@@ -104,7 +105,8 @@ function setTime(time) {
       ...currentState.ui,
       startButton: { enabled: !isZero, visible: true },
       stopButton: { enabled: false, visible: false },
-      clearButton: { enabled: !isZero, visible: true, text: "Clear" },
+      clearButton: { enabled: !isZero, visible: true },
+      resetButton: { enabled: false, visible: false },
     },
   });
 }
@@ -130,7 +132,8 @@ function startTimer() {
     ui: {
       startButton: { enabled: false, visible: false },
       stopButton: { enabled: true, visible: true },
-      clearButton: { enabled: false, visible: true, text: "Reset" },
+      clearButton: { enabled: false, visible: false },
+      resetButton: { enabled: false, visible: true },
       timerClickable: false,
       modeButtonsClickable: false,
     },
@@ -144,7 +147,8 @@ function pauseTimer() {
     ui: {
       startButton: { enabled: true, visible: true },
       stopButton: { enabled: false, visible: false },
-      clearButton: { enabled: true, visible: true, text: "Reset" },
+      clearButton: { enabled: false, visible: false },
+      resetButton: { enabled: true, visible: true },
       timerClickable: true,
       modeButtonsClickable: true,
     },
@@ -158,8 +162,9 @@ function finishTimer() {
     ui: {
       startButton: { enabled: false, visible: true },
       stopButton: { enabled: false, visible: false },
-      clearButton: { enabled: true, visible: true, text: "Reset" },
-      timerClickable: true,
+      clearButton: { enabled: false, visible: false },
+      resetButton: { enabled: true, visible: true },
+      timerClickable: false,
       modeButtonsClickable: true,
     },
   });
@@ -174,7 +179,8 @@ function resetFromFinished() {
     ui: {
       startButton: { enabled: true, visible: true },
       stopButton: { enabled: false, visible: false },
-      clearButton: { enabled: true, visible: true, text: "Clear" },
+      clearButton: { enabled: true, visible: true },
+      resetButton: { enabled: false, visible: false },
       timerClickable: true,
       modeButtonsClickable: true,
     },
@@ -192,7 +198,8 @@ function clearTimer() {
         ...currentState.ui,
         startButton: { enabled: false, visible: true },
         stopButton: { enabled: false, visible: false },
-        clearButton: { enabled: false, visible: true, text: "Clear" },
+        clearButton: { enabled: false, visible: true },
+        resetButton: { enabled: false, visible: false },
       },
     });
   } else if (currState === TIMER_STATE.PAUSED) {
@@ -204,7 +211,8 @@ function clearTimer() {
         ...currentState.ui,
         startButton: { enabled: true, visible: true },
         stopButton: { enabled: false, visible: false },
-        clearButton: { enabled: true, visible: true, text: "Clear" },
+        clearButton: { enabled: true, visible: true },
+        resetButton: { enabled: false, visible: false },
       },
     });
   }
